@@ -28,7 +28,7 @@ class SaralYatriApp extends ConsumerWidget {
         '/booking': (context) => const BookingScreen(),
         '/ticket': (context) => const TicketScreen(),
         '/qr-demo': (context) => const QRDemoScreen(),
-        '/conductor-verify': (context) => const TicketVerificationScreen(),
+        // '/conductor-verify': (context) => const TicketVerificationScreen(),
       },
     );
   }
