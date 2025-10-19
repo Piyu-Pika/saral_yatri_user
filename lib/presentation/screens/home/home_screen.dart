@@ -9,6 +9,7 @@ import '../../providers/bus_provider.dart';
 import '../../widgets/booking_options_drawer.dart';
 import '../../widgets/bus_marker.dart';
 import '../../widgets/bus_stop_marker.dart';
+import '../profile/profile_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -89,16 +90,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(
+               PopupMenuItem(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
+                },
                 value: 'profile',
-                child: ListTile(
+                child: const ListTile(
                   leading: Icon(Icons.person),
                   title: Text('Profile'),
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
+                onTap: (){
+                  Navigator.pushNamed(context, '/ticket');
+                },
                 value: 'tickets',
-                child: ListTile(
+                child: const ListTile(
                   leading: Icon(Icons.confirmation_number),
                   title: Text('My Tickets'),
                 ),
@@ -191,7 +198,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Welcome, ${authState.user?.name ?? 'User'}!',
+                      'Welcome, ${authState.user?.username ?? 'User'}!',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

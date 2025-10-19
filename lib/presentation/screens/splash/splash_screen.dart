@@ -49,15 +49,19 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     await Future.delayed(const Duration(seconds: 3));
     
     // Check authentication status
-    final authState = ref.read(authProvider);
-    
-    if (mounted) {
-      if (authState.isLoggedIn) {
-        Navigator.pushReplacementNamed(context, '/home');
-      } else {
-        Navigator.pushReplacementNamed(context, '/login');
-      }
+  // Check authentication status using Riverpod
+  final authNotifier = ref.read(authProvider.notifier);
+  await authNotifier.checkAuthStatus();
+
+  final authState = ref.read(authProvider);
+
+  if (mounted) {
+    if (authState.isLoggedIn) {
+      Navigator.pushReplacementNamed(context, '/home');
+    } else {
+      Navigator.pushReplacementNamed(context, '/login');
     }
+  }
   }
 
   @override

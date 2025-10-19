@@ -85,7 +85,7 @@ class BusRepository {
 
   Future<List<BusStopModel>> getAllBusStops() async {
     try {
-      final response = await ApiClient.get('/bus-stops');
+      final response = await ApiClient.get('/stations/active');
       
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data['bus_stops'] ?? [];

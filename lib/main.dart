@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:saral_yatri/data/providers/auth_provider.dart';
 import 'package:screen_protector/screen_protector.dart';
 import 'app.dart';
 import 'core/services/permission_service.dart';
 import 'core/services/storage_service.dart';
 import 'core/network/api_client.dart';
+
+
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +31,7 @@ void main() async {
   
   // Request permissions
   await PermissionService.requestAllPermissions();
+
   
   runApp(
     const ProviderScope(

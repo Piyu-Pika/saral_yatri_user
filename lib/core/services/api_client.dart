@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
 
+import '../constants/api_constants.dart';
+
 class ApiClient {
-  static const String baseUrl = 'https://your-api-url.com/api/v1';
+  static const String baseUrl = ApiConstants.baseUrl;
   
   late Dio _dio;
   String? _token;
@@ -13,7 +15,7 @@ class ApiClient {
       receiveTimeout: const Duration(seconds: 30),
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        'Accept': ApiConstants.applicationJson,
       },
     ));
 
@@ -21,7 +23,7 @@ class ApiClient {
       InterceptorsWrapper(
         onRequest: (options, handler) {
           if (_token != null) {
-            options.headers['Authorization'] = 'Bearer $_token';
+            options.headers['Authorization'] = '${ApiConstants.bearerPrefix} $_token';
           }
           return handler.next(options);
         },

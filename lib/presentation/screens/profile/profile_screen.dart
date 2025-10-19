@@ -44,8 +44,8 @@ class ProfileScreen extends ConsumerWidget {
                     radius: 50,
                     backgroundColor: Colors.white.withValues(alpha: 0.2),
                     child: Text(
-                      user.name.isNotEmpty
-                          ? user.name[0].toUpperCase()
+                      user.username.isNotEmpty
+                          ? user.username[0].toUpperCase()
                           : 'U',
                       style: const TextStyle(
                         fontSize: 32,
@@ -56,7 +56,7 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    user.name,
+                    user.username,
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,

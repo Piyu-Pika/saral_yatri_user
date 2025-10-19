@@ -1,71 +1,103 @@
 class UserModel {
   final String id;
-  final String name;
+  final String username;
   final String email;
   final String phone;
+  final String role;
   final String? profileImage;
-  final DateTime createdAt;
   final bool isVerified;
-  final List<String> subsidyEligibility;
+  final bool isActive;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? dateOfBirth;
+  final List<String>? subsidyEligible;
 
   UserModel({
     required this.id,
-    required this.name,
+    required this.username,
     required this.email,
     required this.phone,
+    required this.role,
     this.profileImage,
-    required this.createdAt,
     required this.isVerified,
-    required this.subsidyEligibility,
+    required this.isActive,
+    required this.createdAt,
+    required this.updatedAt,
+    this.dateOfBirth,
+    this.subsidyEligible,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    // Helper to safely parse DateTime
+    DateTime? safeParseDateTime(String? dateString) {
+      if (dateString == null || dateString == "0001-01-01T00:00:00Z") {
+        return null;
+      }
+      return DateTime.tryParse(dateString);
+    }
+
     return UserModel(
       id: json['id']?.toString() ?? '',
-      name: json['name']?.toString() ?? '',
+      username: json['username']?.toString() ?? json['name']?.toString() ?? '',
       email: json['email']?.toString() ?? '',
       phone: json['phone']?.toString() ?? '',
+      role: json['role']?.toString() ?? 'passenger',
       profileImage: json['profile_image']?.toString(),
-      createdAt: DateTime.parse(json['created_at']?.toString() ?? DateTime.now().toIso8601String()),
       isVerified: json['is_verified'] == true || json['is_verified'] == 1,
-      subsidyEligibility: (json['subsidy_eligibility'] as List<dynamic>?)
+      isActive: json['is_active'] == true || json['is_active'] == 1,
+      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updated_at']?.toString() ?? '') ?? DateTime.now(),
+      dateOfBirth: safeParseDateTime(json['date_of_birth']?.toString()),
+      subsidyEligible: (json['subsidy_eligible'] as List<dynamic>?)
           ?.map((e) => e.toString())
-          .toList() ?? <String>[],
+          .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'name': name,
+      'username': username,
       'email': email,
       'phone': phone,
+      'role': role,
       'profile_image': profileImage,
-      'created_at': createdAt.toIso8601String(),
       'is_verified': isVerified,
-      'subsidy_eligibility': subsidyEligibility,
+      'is_active': isActive,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'date_of_birth': dateOfBirth?.toIso8601String(),
+      'subsidy_eligible': subsidyEligible,
     };
   }
 
   UserModel copyWith({
     String? id,
-    String? name,
+    String? username,
     String? email,
     String? phone,
+    String? role,
     String? profileImage,
-    DateTime? createdAt,
     bool? isVerified,
-    List<String>? subsidyEligibility,
+    bool? isActive,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? dateOfBirth,
+    List<String>? subsidyEligible,
   }) {
     return UserModel(
       id: id ?? this.id,
-      name: name ?? this.name,
+      username: username ?? this.username,
       email: email ?? this.email,
       phone: phone ?? this.phone,
+      role: role ?? this.role,
       profileImage: profileImage ?? this.profileImage,
-      createdAt: createdAt ?? this.createdAt,
       isVerified: isVerified ?? this.isVerified,
-      subsidyEligibility: subsidyEligibility ?? this.subsidyEligibility,
+      isActive: isActive ?? this.isActive,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      subsidyEligible: subsidyEligible ?? this.subsidyEligible,
     );
   }
 }

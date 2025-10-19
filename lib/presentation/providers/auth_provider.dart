@@ -45,10 +45,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final AuthRepository _authRepository;
 
   AuthNotifier(this._authRepository) : super(AuthState()) {
-    _checkLoginStatus();
+    checkAuthStatus();
   }
 
-  Future<void> _checkLoginStatus() async {
+  Future<void> checkAuthStatus() async {
+    state = state.copyWith(isLoading: true);
     try {
       final isLoggedIn = await _authRepository.isLoggedIn();
       if (isLoggedIn) {
@@ -56,10 +57,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
         state = state.copyWith(
           user: user,
           isLoggedIn: true,
+          isLoading: false,
+        );
+      } else {
+        state = state.copyWith(
+          isLoggedIn: false,
+          user: null,
+          isLoading: false,
         );
       }
     } catch (e) {
       Log.e('Error checking login status: $e');
+      state = state.copyWith(
+        isLoggedIn: false,
+        user: null,
+        isLoading: false,
+        error: e.toString(),
+      );
     }
   }
 
@@ -79,6 +93,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         state = state.copyWith(
           isLoading: false,
           error: 'Login failed',
+          isLoggedIn: false,
         );
         return false;
       }
@@ -86,6 +101,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = state.copyWith(
         isLoading: false,
         error: e.toString(),
+        isLoggedIn: false,
       );
       return false;
     }
@@ -117,6 +133,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         state = state.copyWith(
           isLoading: false,
           error: 'Registration failed',
+          isLoggedIn: false,
         );
         return false;
       }
@@ -124,6 +141,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = state.copyWith(
         isLoading: false,
         error: e.toString(),
+        isLoggedIn: false,
       );
       return false;
     }
@@ -135,6 +153,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = AuthState();
     } catch (e) {
       Log.e('Error during logout: $e');
+      state = state.copyWith(error: e.toString());
     }
   }
 

@@ -138,4 +138,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     await _authService.logout();
     state = AuthState();
   }
+
+  
 }

@@ -37,16 +37,48 @@ class AuthService {
           'password': password,
           'phone': phone,
           'role': role,
-          if (aadhaarNumber != null) 'aadhaar_number': aadhaarNumber,
-          if (dateOfBirth != null)
-            'date_of_birth': dateOfBirth.toIso8601String(),
-          if (fullName != null) 'full_name': fullName,
-          if (gender != null) 'gender': gender,
+          'aadhaarNumber': aadhaarNumber,
+          'dateOfBirth': dateOfBirth?.toIso8601String(),
+          'fullName': fullName,
+          'gender': gender,
         },
       );
+      if (response.data != null && response.data['data'] != null) {
+        final data = response.data['data'];
+        final token = data['token'];
+        final user = UserModel.fromJson(data['user']);
 
-      final token = response.data['token'];
-      final user = UserModel.fromJson(response.data['user']);
+        _apiClient.setToken(token);
+        await StorageService.setString(AppConstants.userTokenKey, token);
+        await StorageService.setObject(AppConstants.userDataKey, user.toJson());
+        await StorageService.setBool(AppConstants.isLoggedInKey, true);
+
+        return user;
+      } else {
+        throw Exception('Invalid response from server');
+      }
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+Future<UserModel> login({
+  required String username,
+  required String password,
+}) async {
+  try {
+    final response = await _apiClient.dio.post('/auth/login', data: {
+      'username': username,
+      'password': password,
+    });
+
+    if (response.data != null && response.data['data'] != null) {
+      final data = response.data['data'] as Map<String, dynamic>;
+
+      final token = data['token'] as String;
+      final userMap = data['user'] as Map<String, dynamic>;
+
+      final user = UserModel.fromJson(userMap);
 
       _apiClient.setToken(token);
       await StorageService.setString(AppConstants.userTokenKey, token);
@@ -54,37 +86,14 @@ class AuthService {
       await StorageService.setBool(AppConstants.isLoggedInKey, true);
 
       return user;
-    } on DioException catch (e) {
-      throw _handleError(e);
+    } else {
+      throw Exception('Invalid response from server');
     }
+  } on DioException catch (e) {
+    throw _handleError(e);
   }
+}
 
-  Future<UserModel> login({
-    required String username,
-    required String password,
-  }) async {
-    try {
-      final response = await _apiClient.dio.post(
-        '/auth/login',
-        data: {
-          'username': username,
-          'password': password,
-        },
-      );
-
-      final token = response.data['token'];
-      final user = UserModel.fromJson(response.data['user']);
-
-      _apiClient.setToken(token);
-      await StorageService.setString(AppConstants.userTokenKey, token);
-      await StorageService.setObject(AppConstants.userDataKey, user.toJson());
-      await StorageService.setBool(AppConstants.isLoggedInKey, true);
-
-      return user;
-    } on DioException catch (e) {
-      throw _handleError(e);
-    }
-  }
 
   Future<UserModel> getProfile() async {
     try {

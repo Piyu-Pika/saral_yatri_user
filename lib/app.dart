@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/app_theme.dart';
+import 'presentation/screens/profile/profile_screen.dart';
+import 'presentation/screens/qr_scanner_screen.dart';
 import 'presentation/screens/splash/splash_screen.dart';
 import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
@@ -28,6 +30,12 @@ class SaralYatriApp extends ConsumerWidget {
         '/booking': (context) => const BookingScreen(),
         '/ticket': (context) => const TicketScreen(),
         '/qr-demo': (context) => const QRDemoScreen(),
+        '/qr-scanner': (context) => QRScannerScreen(
+          onTicketScanned: (ticket) {
+            // TODO: handle scanned ticket
+          },
+        ),
+        '/profile': (context) => const ProfileScreen(),
         // '/conductor-verify': (context) => const TicketVerificationScreen(),
       },
     );
