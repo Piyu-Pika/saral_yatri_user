@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/services/qr_service.dart';
 import '../../../data/providers/bus_provider.dart';
 
 class QRScannerScreen extends ConsumerStatefulWidget {
@@ -25,13 +26,13 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen> {
 
   void _onDetect(BarcodeCapture capture) async {
     if (_isProcessing) return;
-    
+
     final List<Barcode> barcodes = capture.barcodes;
     if (barcodes.isNotEmpty) {
       setState(() {
         _isProcessing = true;
       });
-      
+
       final String? qrCode = barcodes.first.rawValue;
       if (qrCode != null) {
         await _handleQRCode(qrCode);
@@ -41,8 +42,18 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen> {
 
   Future<void> _handleQRCode(String qrCode) async {
     try {
-      // Check if it's a bus QR code or conductor QR code
+      print('QR Code scanned: $qrCode'); // Debug log
+
+      // Handle Bus QR Code
       if (qrCode.startsWith('BUS_')) {
+        print('Processing Bus QR Code'); // Debug log
+        final busId = qrCode.substring(4); // Remove 'BUS_' prefix
+
+        if (busId.isEmpty) {
+          _showError('Invalid bus QR code');
+          return;
+        }
+
         final bus = await ref.read(busProvider.notifier).getBusByQrCode(qrCode);
         if (bus != null && mounted) {
           Navigator.pushReplacementNamed(
@@ -53,19 +64,114 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen> {
         } else {
           _showError('Bus not found or inactive');
         }
-      } else if (qrCode.startsWith('CONDUCTOR_')) {
-        // Handle conductor QR code
+        return;
+      }
+
+      // Handle Conductor QR Code
+      if (qrCode.startsWith('CONDUCTOR_')) {
+        print('Processing Conductor QR Code'); // Debug log
+        final dataWithoutPrefix =
+            qrCode.substring(10); // Remove 'CONDUCTOR_' prefix
+        final parts = dataWithoutPrefix.split('|');
+
+        if (parts.length != 8) {
+          _showError('Invalid conductor QR code format');
+          return;
+        }
+
+        // Parse the timestamp first
+        final conductorTimestamp = int.tryParse(parts[7]) ?? 0;
+
+        // Parse conductor data
+        final conductorData = {
+          'type': 'conductor',
+          'conductor_id': parts[0],
+          'bus_id': parts[1],
+          'bus_number': parts[2],
+          'route_id': parts[3],
+          'route_name': parts[4],
+          'conductor_name': parts[5],
+          'fare': double.tryParse(parts[6]) ?? 0.0,
+          'timestamp': conductorTimestamp,
+        };
+
+        // Check if conductor QR is too old (24 hours)
+        final timestamp =
+            DateTime.fromMillisecondsSinceEpoch(conductorTimestamp);
+        const maxAge = Duration(hours: 24);
+        if (DateTime.now().difference(timestamp) > maxAge) {
+          _showError('Conductor QR code expired');
+          return;
+        }
+
         if (mounted) {
           Navigator.pushReplacementNamed(
             context,
             '/booking',
-            arguments: {'conductorId': qrCode, 'scanType': 'conductor'},
+            arguments: {
+              'conductorData': conductorData,
+              'scanType': 'conductor',
+            },
           );
         }
-      } else {
-        _showError('Invalid QR code');
+        return;
       }
+
+      // Handle Ticket QR Code (pipe-separated format)
+      final parts = qrCode.split('|');
+      if (parts.length == 6) {
+        print('Processing Ticket QR Code'); // Debug log
+        try {
+          // Parse the timestamp values first
+          final expiryTimestamp = int.parse(parts[4]);
+          final generationTimestamp = int.parse(parts[5]);
+
+          final ticketData = {
+            'type': 'ticket',
+            'ticket_id': parts[0],
+            'user_id': parts[1],
+            'bus_id': parts[2],
+            'route_id': parts[3],
+            'expiry': expiryTimestamp,
+            'timestamp': generationTimestamp,
+          };
+
+          // Check if ticket is expired
+          final expiryTime =
+              DateTime.fromMillisecondsSinceEpoch(expiryTimestamp);
+          if (DateTime.now().isAfter(expiryTime)) {
+            _showError('Ticket expired');
+            return;
+          }
+
+          // Check if ticket QR is too old (24 hours)
+          final timestamp =
+              DateTime.fromMillisecondsSinceEpoch(generationTimestamp);
+          const maxAge = Duration(hours: 24);
+          if (DateTime.now().difference(timestamp) > maxAge) {
+            _showError('Ticket QR code too old');
+            return;
+          }
+
+          if (mounted) {
+            Navigator.pushReplacementNamed(
+              context,
+              '/ticket-verification',
+              arguments: {'ticketData': ticketData},
+            );
+          }
+          return;
+        } catch (e) {
+          print('Error parsing ticket QR: $e'); // Debug log
+          _showError('Invalid ticket QR code');
+          return;
+        }
+      }
+
+      // If none of the above formats match
+      _showError('Invalid QR code format');
     } catch (e) {
+      print('Error processing QR code: $e'); // Debug log
       _showError('Error processing QR code: $e');
     } finally {
       setState(() {
@@ -92,7 +198,7 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Scan QR Code'),
+        title: const Text('QR Scanner'),
         backgroundColor: AppTheme.primaryColor,
         foregroundColor: Colors.white,
         actions: [
@@ -130,7 +236,7 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen> {
             controller: cameraController,
             onDetect: _onDetect,
           ),
-          
+
           // Overlay
           Container(
             decoration: const ShapeDecoration(
@@ -143,7 +249,7 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen> {
               ),
             ),
           ),
-          
+
           // Instructions
           Positioned(
             bottom: 100,
@@ -187,7 +293,7 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen> {
               ),
             ),
           ),
-          
+
           // Processing Indicator
           if (_isProcessing)
             Container(
@@ -247,7 +353,8 @@ class QrScannerOverlayShape extends ShapeBorder {
       return Path()
         ..moveTo(rect.left, rect.bottom)
         ..lineTo(rect.left, rect.top + borderRadius)
-        ..quadraticBezierTo(rect.left, rect.top, rect.left + borderRadius, rect.top)
+        ..quadraticBezierTo(
+            rect.left, rect.top, rect.left + borderRadius, rect.top)
         ..lineTo(rect.right, rect.top);
     }
 
@@ -299,27 +406,43 @@ class QrScannerOverlayShape extends ShapeBorder {
       // Top left
       ..moveTo(cutOutRect.left - borderOffset, cutOutRect.top + borderLength)
       ..lineTo(cutOutRect.left - borderOffset, cutOutRect.top + borderRadius)
-      ..quadraticBezierTo(cutOutRect.left - borderOffset, cutOutRect.top - borderOffset,
-          cutOutRect.left + borderRadius, cutOutRect.top - borderOffset)
+      ..quadraticBezierTo(
+          cutOutRect.left - borderOffset,
+          cutOutRect.top - borderOffset,
+          cutOutRect.left + borderRadius,
+          cutOutRect.top - borderOffset)
       ..lineTo(cutOutRect.left + borderLength, cutOutRect.top - borderOffset)
       // Top right
       ..moveTo(cutOutRect.right - borderLength, cutOutRect.top - borderOffset)
       ..lineTo(cutOutRect.right - borderRadius, cutOutRect.top - borderOffset)
-      ..quadraticBezierTo(cutOutRect.right + borderOffset, cutOutRect.top - borderOffset,
-          cutOutRect.right + borderOffset, cutOutRect.top + borderRadius)
+      ..quadraticBezierTo(
+          cutOutRect.right + borderOffset,
+          cutOutRect.top - borderOffset,
+          cutOutRect.right + borderOffset,
+          cutOutRect.top + borderRadius)
       ..lineTo(cutOutRect.right + borderOffset, cutOutRect.top + borderLength)
       // Bottom right
-      ..moveTo(cutOutRect.right + borderOffset, cutOutRect.bottom - borderLength)
-      ..lineTo(cutOutRect.right + borderOffset, cutOutRect.bottom - borderRadius)
-      ..quadraticBezierTo(cutOutRect.right + borderOffset, cutOutRect.bottom + borderOffset,
-          cutOutRect.right - borderRadius, cutOutRect.bottom + borderOffset)
-      ..lineTo(cutOutRect.right - borderLength, cutOutRect.bottom + borderOffset)
+      ..moveTo(
+          cutOutRect.right + borderOffset, cutOutRect.bottom - borderLength)
+      ..lineTo(
+          cutOutRect.right + borderOffset, cutOutRect.bottom - borderRadius)
+      ..quadraticBezierTo(
+          cutOutRect.right + borderOffset,
+          cutOutRect.bottom + borderOffset,
+          cutOutRect.right - borderRadius,
+          cutOutRect.bottom + borderOffset)
+      ..lineTo(
+          cutOutRect.right - borderLength, cutOutRect.bottom + borderOffset)
       // Bottom left
       ..moveTo(cutOutRect.left + borderLength, cutOutRect.bottom + borderOffset)
       ..lineTo(cutOutRect.left + borderRadius, cutOutRect.bottom + borderOffset)
-      ..quadraticBezierTo(cutOutRect.left - borderOffset, cutOutRect.bottom + borderOffset,
-          cutOutRect.left - borderOffset, cutOutRect.bottom - borderRadius)
-      ..lineTo(cutOutRect.left - borderOffset, cutOutRect.bottom - borderLength);
+      ..quadraticBezierTo(
+          cutOutRect.left - borderOffset,
+          cutOutRect.bottom + borderOffset,
+          cutOutRect.left - borderOffset,
+          cutOutRect.bottom - borderRadius)
+      ..lineTo(
+          cutOutRect.left - borderOffset, cutOutRect.bottom - borderLength);
 
     canvas.drawPath(path, borderPaint);
   }

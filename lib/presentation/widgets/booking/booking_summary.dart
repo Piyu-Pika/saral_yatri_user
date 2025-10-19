@@ -74,9 +74,9 @@ class BookingSummary extends StatelessWidget {
                   ),
               ],
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Journey details
             if (fromStation != null && toStation != null) ...[
               _JourneyRoute(
@@ -85,7 +85,7 @@ class BookingSummary extends StatelessWidget {
               ),
               const SizedBox(height: 16),
             ],
-            
+
             // Bus details
             if (busNumber != null || routeName != null) ...[
               _DetailRow(
@@ -96,7 +96,7 @@ class BookingSummary extends StatelessWidget {
               ),
               const SizedBox(height: 12),
             ],
-            
+
             // Travel date
             if (travelDate != null) ...[
               _DetailRow(
@@ -106,7 +106,7 @@ class BookingSummary extends StatelessWidget {
               ),
               const SizedBox(height: 12),
             ],
-            
+
             // Payment method
             if (paymentMethod != null) ...[
               _DetailRow(
@@ -116,7 +116,7 @@ class BookingSummary extends StatelessWidget {
               ),
               const SizedBox(height: 16),
             ],
-            
+
             // Fare details
             if (originalFare != null && finalFare != null) ...[
               FareDisplay(
@@ -137,7 +137,7 @@ class BookingSummary extends StatelessWidget {
     final today = DateTime(now.year, now.month, now.day);
     final tomorrow = today.add(const Duration(days: 1));
     final targetDate = DateTime(date.year, date.month, date.day);
-    
+
     if (targetDate == today) {
       return 'Today, ${_formatTime(date)}';
     } else if (targetDate == tomorrow) {
@@ -146,7 +146,7 @@ class BookingSummary extends StatelessWidget {
       return '${date.day}/${date.month}/${date.year}, ${_formatTime(date)}';
     }
   }
-  
+
   String _formatTime(DateTime date) {
     final hour = date.hour.toString().padLeft(2, '0');
     final minute = date.minute.toString().padLeft(2, '0');
@@ -192,7 +192,7 @@ class _JourneyRoute extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  fromStation.stationName,
+                  fromStation.name,
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -200,7 +200,7 @@ class _JourneyRoute extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  fromStation.stationCode,
+                  fromStation.code,
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textSecondary,
@@ -209,7 +209,7 @@ class _JourneyRoute extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Arrow
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -224,7 +224,7 @@ class _JourneyRoute extends StatelessWidget {
               size: 16,
             ),
           ),
-          
+
           // To station
           Expanded(
             child: Column(
@@ -241,7 +241,7 @@ class _JourneyRoute extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  toStation.stationName,
+                  toStation.name,
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -250,7 +250,7 @@ class _JourneyRoute extends StatelessWidget {
                   textAlign: TextAlign.end,
                 ),
                 Text(
-                  toStation.stationCode,
+                  toStation.code,
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textSecondary,

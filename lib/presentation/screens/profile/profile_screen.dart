@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../data/providers/auth_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../widgets/common/custom_app_bar.dart';
 import '../../widgets/common/custom_button.dart';
 import '../auth/login_screen.dart';
@@ -244,12 +244,14 @@ class ProfileScreen extends ConsumerWidget {
       ),
     );
 
-    if (shouldLogout == true && context.mounted) {
+    if (shouldLogout == true) {
       await ref.read(authProvider.notifier).logout();
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-        (route) => false,
-      );
+      if (context.mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          (route) => false,
+        );
+      }
     }
   }
 }

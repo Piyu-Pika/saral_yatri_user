@@ -20,6 +20,7 @@ class ApiConstants {
   static const String activeRoutes = '/routes/active';
   static const String routeById = '/routes';
   static const String routeFare = '/routes/fare';
+  static const String routeStations = '/routes'; // /routes/{route_id}/stations
 
   // Station Endpoints
   static const String activeStations = '/stations/active';

@@ -5,7 +5,7 @@ import 'package:latlong2/latlong.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/services/location_service.dart';
 import '../../providers/auth_provider.dart';
-import '../../providers/bus_provider.dart';
+import '../../../data/providers/bus_provider.dart';
 import '../../widgets/booking_options_drawer.dart';
 import '../../widgets/bus_marker.dart';
 import '../../widgets/bus_stop_marker.dart';
@@ -61,6 +61,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _openBookingOptions() {
     _scaffoldKey.currentState?.openDrawer();
   }
+
+  // // Debug method to test API logging
+  // void _testApiCall() async {
+  //   try {
+  //     // Test API call to see logging in action
+  //     await ref.read(busProvider.notifier).loadAllBuses();
+      
+  //     if (mounted) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(
+  //           content: Text('API test completed - check logs!'),
+  //           backgroundColor: Colors.green,
+  //         ),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     if (mounted) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text('API test failed: $e'),
+  //           backgroundColor: Colors.red,
+  //         ),
+  //       );
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

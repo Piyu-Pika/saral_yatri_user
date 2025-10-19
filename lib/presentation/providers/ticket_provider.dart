@@ -31,12 +31,13 @@ class TicketState {
     bool? isLoading,
     String? error,
     Map<String, dynamic>? fareCalculation,
+    bool clearError = false,
   }) {
     return TicketState(
       tickets: tickets ?? this.tickets,
       currentTicket: currentTicket ?? this.currentTicket,
       isLoading: isLoading ?? this.isLoading,
-      error: error,
+      error: clearError ? null : (error ?? this.error),
       fareCalculation: fareCalculation ?? this.fareCalculation,
     );
   }
@@ -48,7 +49,7 @@ class TicketNotifier extends StateNotifier<TicketState> {
   TicketNotifier(this._ticketRepository) : super(TicketState());
 
   Future<void> loadUserTickets() async {
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(isLoading: true, clearError: true);
     
     try {
       final tickets = await _ticketRepository.getUserTickets();
@@ -71,7 +72,7 @@ class TicketNotifier extends StateNotifier<TicketState> {
     required String droppingStop,
     required String paymentMethod,
   }) async {
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(isLoading: true, clearError: true);
     
     try {
       final ticket = await _ticketRepository.bookTicket(
@@ -118,7 +119,7 @@ class TicketNotifier extends StateNotifier<TicketState> {
         droppingStop: droppingStop,
       );
       
-      state = state.copyWith(fareCalculation: fareData);
+      state = state.copyWith(fareCalculation: fareData, clearError: true);
     } catch (e) {
       Log.e('Error calculating fare: $e');
       state = state.copyWith(error: e.toString());
@@ -126,7 +127,7 @@ class TicketNotifier extends StateNotifier<TicketState> {
   }
 
   Future<void> getTicketById(String ticketId) async {
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(isLoading: true, clearError: true);
     
     try {
       final ticket = await _ticketRepository.getTicketById(ticketId);
@@ -161,7 +162,7 @@ class TicketNotifier extends StateNotifier<TicketState> {
   }
 
   void clearError() {
-    state = state.copyWith(error: null);
+    state = state.copyWith(clearError: true);
   }
 
   void clearFareCalculation() {

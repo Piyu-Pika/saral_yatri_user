@@ -62,20 +62,23 @@ class _QRScannerWidgetState extends State<QRScannerWidget> {
     });
 
     try {
-      AppLogger.info('QR Code detected');
+      AppLogger.info('QR Code detected: ${code.substring(0, code.length > 20 ? 20 : code.length)}...');
       
-      // Parse QR data
-      final qrData = QRService.parseTicketQRData(code);
+      // Parse QR data based on type
+      final qrData = QRService.parseQRData(code);
       if (qrData == null) {
         _handleError('Invalid QR code format');
         return;
       }
 
       // Validate QR data
-      if (!QRService.validateTicketQR(qrData)) {
-        _handleError('Invalid or expired ticket');
+      if (!QRService.validateQRCode(code)) {
+        _handleError('Invalid or expired QR code');
         return;
       }
+
+      // Add raw code to data for further processing
+      qrData['raw_code'] = code;
 
       // Success
       widget.onQRScanned(qrData);

@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants/api_constants.dart';
 import '../exceptions/api_exceptions.dart';
+import '../network/api_client.dart';
+import '../utils/logger.dart';
 import 'auth_service.dart';
 
 final apiServiceProvider = Provider<ApiService>((ref) {
@@ -10,36 +12,9 @@ final apiServiceProvider = Provider<ApiService>((ref) {
 });
 
 class ApiService {
-  late final Dio _dio;
   final AuthService _authService;
 
-  ApiService(this._authService) {
-    _dio = Dio(BaseOptions(
-      baseUrl: ApiConstants.baseUrl,
-      connectTimeout: ApiConstants.connectTimeout,
-      receiveTimeout: ApiConstants.receiveTimeout,
-      headers: {
-        ApiConstants.contentType: ApiConstants.applicationJson,
-      },
-    ));
-
-    _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) async {
-        final token = await _authService.getToken();
-        if (token != null) {
-          options.headers[ApiConstants.authHeader] = '${ApiConstants.bearerPrefix} $token';
-        }
-        handler.next(options);
-      },
-      onError: (error, handler) {
-        final apiException = _handleError(error);
-        handler.reject(DioException(
-          requestOptions: error.requestOptions,
-          error: apiException,
-        ));
-      },
-    ));
-  }
+  ApiService(this._authService);
 
   ApiException _handleError(DioException error) {
     switch (error.type) {
@@ -62,33 +37,41 @@ class ApiService {
 
   Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) async {
     try {
-      return await _dio.get(path, queryParameters: queryParameters);
+      AppLogger.debug('[ApiService] GET request to: $path');
+      return await ApiClient.get(path, queryParameters: queryParameters);
     } on DioException catch (e) {
-      throw e.error as ApiException;
+      AppLogger.error('[ApiService] GET request failed: ${e.message}');
+      throw _handleError(e);
     }
   }
 
   Future<Response> post(String path, {dynamic data}) async {
     try {
-      return await _dio.post(path, data: data);
+      AppLogger.debug('[ApiService] POST request to: $path');
+      return await ApiClient.post(path, data: data);
     } on DioException catch (e) {
-      throw e.error as ApiException;
+      AppLogger.error('[ApiService] POST request failed: ${e.message}');
+      throw _handleError(e);
     }
   }
 
   Future<Response> put(String path, {dynamic data}) async {
     try {
-      return await _dio.put(path, data: data);
+      AppLogger.debug('[ApiService] PUT request to: $path');
+      return await ApiClient.put(path, data: data);
     } on DioException catch (e) {
-      throw e.error as ApiException;
+      AppLogger.error('[ApiService] PUT request failed: ${e.message}');
+      throw _handleError(e);
     }
   }
 
   Future<Response> delete(String path) async {
     try {
-      return await _dio.delete(path);
+      AppLogger.debug('[ApiService] DELETE request to: $path');
+      return await ApiClient.delete(path);
     } on DioException catch (e) {
-      throw e.error as ApiException;
+      AppLogger.error('[ApiService] DELETE request failed: ${e.message}');
+      throw _handleError(e);
     }
   }
 }

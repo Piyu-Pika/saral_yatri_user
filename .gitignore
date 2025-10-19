@@ -45,3 +45,5 @@ app.*.map.json
 /android/app/release
 lib.zip
 QR_SYSTEM_README.md
+QR_FORMATS_SAMPLE.md
+QR_TEST_SAMPLES.md

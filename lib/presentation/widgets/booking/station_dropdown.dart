@@ -51,20 +51,22 @@ class _StationDropdownState extends ConsumerState<StationDropdown> {
   void _filterStations(String query) {
     final stationState = ref.read(stationProvider);
     final allStations = stationState.stations;
-    
+
     setState(() {
       if (query.isEmpty) {
         _filteredStations = allStations
-            .where((station) => 
+            .where((station) =>
                 widget.excludeStationIds?.contains(station.id) != true)
             .toList();
       } else {
         _filteredStations = allStations
             .where((station) =>
                 (widget.excludeStationIds?.contains(station.id) != true) &&
-                (station.stationName.toLowerCase().contains(query.toLowerCase()) ||
-                 station.stationCode.toLowerCase().contains(query.toLowerCase()) ||
-                 station.address.city.toLowerCase().contains(query.toLowerCase())))
+                (station.name.toLowerCase().contains(query.toLowerCase()) ||
+                    station.code.toLowerCase().contains(query.toLowerCase()) ||
+                    station.routeId
+                        .toLowerCase()
+                        .contains(query.toLowerCase())))
             .toList();
       }
     });
@@ -72,15 +74,15 @@ class _StationDropdownState extends ConsumerState<StationDropdown> {
 
   String _getDistanceText(StationModel station) {
     if (!widget.showDistance) return '';
-    
+
     final locationNotifier = ref.read(locationProvider.notifier);
     final distance = locationNotifier.calculateDistanceToStation(
       station.location.latitude,
       station.location.longitude,
     );
-    
+
     if (distance == null) return '';
-    
+
     if (distance < 1000) {
       return ' • ${distance.round()}m away';
     } else {
@@ -126,7 +128,8 @@ class _StationDropdownState extends ConsumerState<StationDropdown> {
                 },
                 borderRadius: BorderRadius.circular(12),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   child: Row(
                     children: [
                       const Icon(
@@ -141,7 +144,7 @@ class _StationDropdownState extends ConsumerState<StationDropdown> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    widget.selectedStation!.stationName,
+                                    widget.selectedStation!.name,
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
@@ -149,7 +152,7 @@ class _StationDropdownState extends ConsumerState<StationDropdown> {
                                     ),
                                   ),
                                   Text(
-                                    '${widget.selectedStation!.stationCode} • ${widget.selectedStation!.address.city}${_getDistanceText(widget.selectedStation!)}',
+                                    '${widget.selectedStation!.code} • Route: ${widget.selectedStation!.routeId}${_getDistanceText(widget.selectedStation!)}',
                                     style: const TextStyle(
                                       fontSize: 12,
                                       color: AppColors.textSecondary,
@@ -158,7 +161,8 @@ class _StationDropdownState extends ConsumerState<StationDropdown> {
                                 ],
                               )
                             : Text(
-                                widget.hintText ?? 'Select ${widget.label.toLowerCase()}',
+                                widget.hintText ??
+                                    'Select ${widget.label.toLowerCase()}',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   color: AppColors.textSecondary,
@@ -166,7 +170,9 @@ class _StationDropdownState extends ConsumerState<StationDropdown> {
                               ),
                       ),
                       Icon(
-                        _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                        _isExpanded
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
                         color: AppColors.textSecondary,
                       ),
                     ],
@@ -223,8 +229,10 @@ class _StationDropdownState extends ConsumerState<StationDropdown> {
                                     itemCount: _filteredStations.length,
                                     itemBuilder: (context, index) {
                                       final station = _filteredStations[index];
-                                      final isSelected = widget.selectedStation?.id == station.id;
-                                      
+                                      final isSelected =
+                                          widget.selectedStation?.id ==
+                                              station.id;
+
                                       return InkWell(
                                         onTap: () {
                                           widget.onChanged(station);
@@ -240,7 +248,8 @@ class _StationDropdownState extends ConsumerState<StationDropdown> {
                                           ),
                                           decoration: BoxDecoration(
                                             color: isSelected
-                                                ? AppColors.primary.withValues(alpha: 0.1)
+                                                ? AppColors.primary
+                                                    .withValues(alpha: 0.1)
                                                 : null,
                                           ),
                                           child: Row(
@@ -255,23 +264,27 @@ class _StationDropdownState extends ConsumerState<StationDropdown> {
                                               const SizedBox(width: 12),
                                               Expanded(
                                                 child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      station.stationName,
+                                                      station.name,
                                                       style: TextStyle(
                                                         fontSize: 14,
-                                                        fontWeight: FontWeight.w500,
+                                                        fontWeight:
+                                                            FontWeight.w500,
                                                         color: isSelected
                                                             ? AppColors.primary
-                                                            : AppColors.textPrimary,
+                                                            : AppColors
+                                                                .textPrimary,
                                                       ),
                                                     ),
                                                     Text(
-                                                      '${station.stationCode} • ${station.address.city}${_getDistanceText(station)}',
+                                                      '${station.code} • Route: ${station.routeId}${_getDistanceText(station)}',
                                                       style: const TextStyle(
                                                         fontSize: 12,
-                                                        color: AppColors.textSecondary,
+                                                        color: AppColors
+                                                            .textSecondary,
                                                       ),
                                                     ),
                                                   ],

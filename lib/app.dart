@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/app_theme.dart';
 import 'presentation/screens/profile/profile_screen.dart';
-import 'presentation/screens/qr_scanner_screen.dart';
+import 'presentation/screens/qr_scanner/qr_scanner_screen.dart';
 import 'presentation/screens/splash/splash_screen.dart';
 import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
 import 'presentation/screens/booking/booking_screen.dart';
 import 'presentation/screens/ticket/ticket_screen.dart';
-import 'presentation/screens/qr_demo_screen.dart';
-import 'presentation/screens/conductor/ticket_verification_screen.dart';
 
 class SaralYatriApp extends ConsumerWidget {
   const SaralYatriApp({super.key});
@@ -29,12 +27,8 @@ class SaralYatriApp extends ConsumerWidget {
         '/home': (context) => const HomeScreen(),
         '/booking': (context) => const BookingScreen(),
         '/ticket': (context) => const TicketScreen(),
-        '/qr-demo': (context) => const QRDemoScreen(),
-        '/qr-scanner': (context) => QRScannerScreen(
-          onTicketScanned: (ticket) {
-            // TODO: handle scanned ticket
-          },
-        ),
+        // '/qr-demo': (context) => const QRDemoScreen(),
+        '/qr-scanner': (context) => const QRScannerScreen(),
         '/profile': (context) => const ProfileScreen(),
         // '/conductor-verify': (context) => const TicketVerificationScreen(),
       },

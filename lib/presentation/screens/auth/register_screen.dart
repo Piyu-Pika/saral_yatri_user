@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/validators.dart';
-import '../../../data/providers/auth_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../widgets/common/custom_text_field.dart';
 import '../../widgets/common/custom_button.dart';
-import '../../widgets/common/loading_widget.dart';
 import '../home/home_screen.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -55,18 +54,24 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final authNotifier = ref.read(authProvider.notifier);
 
     try {
-      await authNotifier.register(
-        username: _usernameController.text.trim(),
+      final success = await authNotifier.register(
+        name: _fullNameController.text.trim(),
         email: _emailController.text.trim(),
         phone: _phoneController.text.trim(),
         password: _passwordController.text,
-        fullName: _fullNameController.text.trim(),
-        aadhaarNumber: _aadhaarController.text.trim(),
       );
 
-      if (mounted) {
+      if (success && mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      } else if (mounted) {
+        final error = ref.read(authProvider).error ?? 'Registration failed';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     } catch (e) {

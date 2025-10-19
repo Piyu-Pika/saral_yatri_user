@@ -42,24 +42,33 @@ class StationMarkerWidget extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(station.stationName),
+        title: Text(station.name),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Code: ${station.stationCode}'),
-            Text('Type: ${station.stationType.toUpperCase()}'),
-            Text('Address: ${station.address.city}, ${station.address.state}'),
-            if (station.accessibility.wheelchairAccess)
-              const Text('• Wheelchair Accessible'),
-            if (station.facilities.waitingArea)
-              const Text('• Waiting Area'),
-            if (station.facilities.restrooms)
-              const Text('• Restrooms'),
-            if (station.facilities.wifi)
-              const Text('• WiFi Available'),
+            Text('Code: ${station.code}'),
+            Text('Route ID: ${station.routeId}'),
+            Text('Sequence: ${station.sequence}'),
+            Text('Location: ${station.location.latitude.toStringAsFixed(4)}, ${station.location.longitude.toStringAsFixed(4)}'),
             const SizedBox(height: 8),
-            Text('Hours: ${station.operatingHours.startTime} - ${station.operatingHours.endTime}'),
+            Row(
+              children: [
+                Icon(
+                  station.isActive ? Icons.check_circle : Icons.cancel,
+                  color: station.isActive ? Colors.green : Colors.red,
+                  size: 16,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  station.isActive ? 'Active' : 'Inactive',
+                  style: TextStyle(
+                    color: station.isActive ? Colors.green : Colors.red,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
         actions: [
