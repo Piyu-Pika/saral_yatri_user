@@ -46,8 +46,8 @@ class _TicketBookingFormScreenState extends ConsumerState<TicketBookingFormScree
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => PaymentScreen(
-          bookingData: bookingData,
-          totalAmount: widget.calculatedFare,
+          // bookingData: bookingData,
+          // totalAmount: widget.calculatedFare,
         ),
       ),
     );

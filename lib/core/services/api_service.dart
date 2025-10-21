@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../constants/api_constants.dart';
 import '../exceptions/api_exceptions.dart';
 import '../network/api_client.dart';
 import '../utils/logger.dart';

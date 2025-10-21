@@ -262,7 +262,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 FloatingActionButton(
                   heroTag: 'tickets',
                   onPressed: () {
-                    Navigator.pushNamed(context, '/ticket');
+                    Navigator.pushNamed(context, '/my-tickets');
                   },
                   backgroundColor: AppTheme.secondaryColor,
                   child: const Icon(Icons.confirmation_number, color: Colors.white),

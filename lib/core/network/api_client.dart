@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-import '../constants/app_constants.dart';
+import '../constants/api_constants.dart';
 import '../services/storage_service.dart';
 import '../utils/logger.dart';
 
@@ -9,9 +9,9 @@ class ApiClient {
   static final Dio _dio = Dio();
   
   static void init() {
-    _dio.options.baseUrl = AppConstants.baseUrl + AppConstants.apiVersion;
-    _dio.options.connectTimeout = const Duration(seconds: 30);
-    _dio.options.receiveTimeout = const Duration(seconds: 30);
+    _dio.options.baseUrl = ApiConstants.baseUrl;
+    _dio.options.connectTimeout = ApiConstants.connectTimeout;
+    _dio.options.receiveTimeout = ApiConstants.receiveTimeout;
     
     // Add Pretty Dio Logger (only in debug mode)
     if (kDebugMode) {
@@ -33,15 +33,15 @@ class ApiClient {
         AppLogger.debug('[API] → ${options.method} ${options.path}');
         
         // Add auth token if available
-        final token = StorageService.getString(AppConstants.userTokenKey);
+        final token = StorageService.getString('user_token');
         if (token != null) {
-          options.headers['Authorization'] = 'Bearer $token';
+          options.headers[ApiConstants.authHeader] = '${ApiConstants.bearerPrefix} $token';
           AppLogger.debug('[API] Added auth token');
         }
         
         // Add common headers
-        options.headers['Content-Type'] = 'application/json';
-        options.headers['Accept'] = 'application/json';
+        options.headers[ApiConstants.contentType] = ApiConstants.applicationJson;
+        options.headers['Accept'] = ApiConstants.applicationJson;
         
         handler.next(options);
       },

@@ -32,6 +32,7 @@ class ApiConstants {
   static const String bookTicket = '/tickets/passenger/book';
   static const String myTickets = '/tickets/passenger/my-tickets';
   static const String ticketDetails = '/tickets/passenger';
+  static const String calculateFare = '/tickets/calculate-fare';
 
   // Headers
   static const String authHeader = 'Authorization';

@@ -236,7 +236,7 @@ class _StationSelectionScreenState
                 hintText: 'Select where you will get off',
                 selectedStation: _selectedDestinationStation,
                 excludeStationIds: _selectedBoardingStation?.id != null 
-                    ? [_selectedBoardingStation!.id!] 
+                    ? [_selectedBoardingStation!.id] 
                     : null,
                 onChanged: (station) {
                   setState(() {

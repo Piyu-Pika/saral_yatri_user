@@ -168,23 +168,34 @@ class BusNotifier extends StateNotifier<BusState> {
         '${ApiConstants.routeStations}/$routeId/stations',
       );
 
+      AppLogger.info('Route stations API response: ${response.data}');
+
       if (response.data['data'] != null) {
         final stationsData = response.data['data'] as List;
-        final stations = stationsData
-            .map((data) => StationModel.fromJson(data))
-            .toList();
+        AppLogger.info('Raw stations data: $stationsData');
+        
+        final stations = <StationModel>[];
+        for (var data in stationsData) {
+          try {
+            final station = StationModel.fromJson(data);
+            stations.add(station);
+            AppLogger.info('Parsed station: ID=${station.id}, Name="${station.name}", Code="${station.code}", Route="${station.routeId}"');
+          } catch (e) {
+            AppLogger.error('Failed to parse station data: $data, Error: $e');
+          }
+        }
 
         // Sort stations by sequence
         stations.sort((a, b) => a.sequence.compareTo(b.sequence));
 
-        AppLogger.info('Loaded ${stations.length} stations for route $routeId');
+        AppLogger.info('Successfully loaded ${stations.length} stations for route $routeId');
 
         state = state.copyWith(
           routeStations: stations,
           isLoadingStations: false,
         );
       } else {
-        AppLogger.warning('No stations data found for route $routeId');
+        AppLogger.warning('No stations data found for route $routeId. Response: ${response.data}');
         state = state.copyWith(
           routeStations: [],
           isLoadingStations: false,
@@ -238,5 +249,23 @@ class BusNotifier extends StateNotifier<BusState> {
     // TODO: Implement nearby buses loading if needed
     // For now, just load all active buses
     await loadActiveBuses();
+  }
+
+  // Get station details by ID
+  Future<StationModel?> getStationById(String stationId) async {
+    try {
+      final response = await _apiService.get(
+        '${ApiConstants.stationById}/$stationId',
+      );
+
+      if (response.data['data'] != null) {
+        return StationModel.fromJson(response.data['data']);
+      }
+      return null;
+    } catch (e) {
+      AppLogger.error('Failed to get station by ID: $e');
+      state = state.copyWith(error: e.toString());
+      return null;
+    }
   }
 }

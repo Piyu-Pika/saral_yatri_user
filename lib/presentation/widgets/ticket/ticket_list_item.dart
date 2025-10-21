@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/ticket_model.dart';
+import '../../../core/utils/ticket_utils.dart';
 
 class TicketListItemWidget extends StatelessWidget {
   final TicketModel ticket;
@@ -57,7 +58,7 @@ class TicketListItemWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            ticket.id,
+                            'Bus ${ticket.busNumber}',
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -65,7 +66,7 @@ class TicketListItemWidget extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            ticket.busNumber,
+                            'Ticket #${TicketUtils.getDisplayTicketNumber(ticket.id)}',
                             style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.textSecondary,

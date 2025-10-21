@@ -11,11 +11,18 @@ class FareBreakdownCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final originalFare = (fareData['original_fare'] ?? 0.0).toDouble();
-    final subsidyAmount = (fareData['subsidy_amount'] ?? 0.0).toDouble();
-    final finalFare = (fareData['final_fare'] ?? 0.0).toDouble();
-    final subsidyType = fareData['subsidy_type'] as String?;
+    // Handle new API response structure
+    final baseFare = (fareData['base_fare'] ?? 0.0).toDouble();
+    final totalSubsidyAmount = (fareData['total_subsidy_amount'] ?? 0.0).toDouble();
+    final totalTaxAmount = (fareData['total_tax_amount'] ?? 0.0).toDouble();
+    final finalAmount = (fareData['final_amount'] ?? 0.0).toDouble();
+    final governmentShare = (fareData['government_share'] ?? 0.0).toDouble();
+    final passengerShare = (fareData['passenger_share'] ?? 0.0).toDouble();
     final distance = (fareData['distance'] ?? 0.0).toDouble();
+    final busType = fareData['bus_type'] as String?;
+    final routeType = fareData['route_type'] as String?;
+    final appliedSubsidies = fareData['applied_subsidies'] as List<dynamic>? ?? [];
+    final taxes = fareData['taxes'] as List<dynamic>? ?? [];
 
     return Card(
       child: Padding(
@@ -32,7 +39,7 @@ class FareBreakdownCard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             
-            // Distance
+            // Trip Info
             if (distance > 0)
               _buildFareRow(
                 'Distance',
@@ -40,59 +47,103 @@ class FareBreakdownCard extends StatelessWidget {
                 isInfo: true,
               ),
             
-            // Original Fare
+            if (busType != null)
+              _buildFareRow(
+                'Bus Type',
+                busType.toUpperCase(),
+                isInfo: true,
+              ),
+            
+            if (routeType != null)
+              _buildFareRow(
+                'Route Type',
+                routeType.toUpperCase(),
+                isInfo: true,
+              ),
+            
+            const SizedBox(height: 8),
+            
+            // Base Fare
             _buildFareRow(
               'Base Fare',
-              '₹${originalFare.toStringAsFixed(2)}',
+              '₹${baseFare.toStringAsFixed(2)}',
             ),
             
-            // Subsidy
-            if (subsidyAmount > 0) ...[
-              _buildFareRow(
-                subsidyType != null ? '$subsidyType Subsidy' : 'Subsidy',
-                '-₹${subsidyAmount.toStringAsFixed(2)}',
-                valueColor: AppTheme.successColor,
-              ),
-              const Divider(height: 24),
+            // Applied Subsidies
+            if (appliedSubsidies.isNotEmpty) ...[
+              for (var subsidy in appliedSubsidies)
+                _buildFareRow(
+                  '${subsidy['scheme_name'] ?? 'Subsidy'}',
+                  '-₹${(subsidy['discount_amount'] ?? 0.0).toStringAsFixed(2)}',
+                  valueColor: AppTheme.successColor,
+                ),
             ],
             
-            // Final Fare
+            // Taxes
+            if (taxes.isNotEmpty) ...[
+              for (var tax in taxes)
+                _buildFareRow(
+                  '${tax['tax_type'] ?? 'Tax'}',
+                  '+₹${(tax['tax_amount'] ?? 0.0).toStringAsFixed(2)}',
+                  valueColor: AppTheme.errorColor,
+                ),
+            ],
+            
+            if (totalSubsidyAmount > 0 || totalTaxAmount > 0)
+              const Divider(height: 24),
+            
+            // Final Amount
             _buildFareRow(
               'Total Amount',
-              '₹${finalFare.toStringAsFixed(2)}',
+              '₹${finalAmount.toStringAsFixed(2)}',
               isTotal: true,
             ),
             
-            // Subsidy Info
-            if (subsidyAmount > 0) ...[
+            // Government Share Info
+            if (totalSubsidyAmount > 0) ...[
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppTheme.successColor.withOpacity(0.1),
+                  color: AppTheme.successColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: AppTheme.successColor.withOpacity(0.3),
+                    color: AppTheme.successColor.withValues(alpha: 0.3),
                   ),
                 ),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
-                      Icons.info_outline,
-                      color: AppTheme.successColor,
-                      size: 20,
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.info_outline,
+                          color: AppTheme.successColor,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'You saved ₹${totalSubsidyAmount.toStringAsFixed(2)} with government subsidy!',
+                            style: const TextStyle(
+                              color: AppTheme.successColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'You saved ₹${subsidyAmount.toStringAsFixed(2)} with government subsidy!',
+                    if (governmentShare > 0) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'Government pays: ₹${governmentShare.toStringAsFixed(2)} • You pay: ₹${passengerShare.toStringAsFixed(2)}',
                         style: const TextStyle(
                           color: AppTheme.successColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
                         ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),

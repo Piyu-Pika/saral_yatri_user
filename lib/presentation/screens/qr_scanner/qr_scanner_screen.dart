@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/services/qr_service.dart';
 import '../../../data/providers/bus_provider.dart';
 
 class QRScannerScreen extends ConsumerStatefulWidget {

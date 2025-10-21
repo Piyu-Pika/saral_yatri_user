@@ -5,7 +5,7 @@ import '../../../core/services/notification_service.dart';
 import '../../widgets/common/custom_app_bar.dart';
 
 class NotificationSettingsScreen extends ConsumerStatefulWidget {
-  const NotificationSettingsScreen({Key? key}) : super(key: key);
+  const NotificationSettingsScreen({super.key});
 
   @override
   ConsumerState<NotificationSettingsScreen> createState() => _NotificationSettingsScreenState();
@@ -187,7 +187,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
       ),
       value: value,
       onChanged: onChanged,
-      activeColor: AppColors.primary,
+      activeThumbColor: AppColors.primary,
     );
   }
 }

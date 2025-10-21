@@ -164,19 +164,19 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           ),
 
           // Map info panel
-          Positioned(
+          const Positioned(
             top: 16,
             left: 16,
             right: 16,
             child: Card(
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(12),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline, color: AppColors.primary),
-                    const SizedBox(width: 8),
+                    Icon(Icons.info_outline, color: AppColors.primary),
+                    SizedBox(width: 8),
                     Expanded(
-                      child: const Text(
+                      child: Text(
                         'Tap on bus stops to see routes. Tap floating button to book tickets.',
                         style: TextStyle(
                           fontSize: 12,

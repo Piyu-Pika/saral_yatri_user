@@ -12,20 +12,20 @@ class ApiException implements Exception {
 }
 
 class NetworkException extends ApiException {
-  NetworkException(String message) : super(message);
+  NetworkException(super.message);
 }
 
 class AuthException extends ApiException {
-  AuthException(String message) : super(message, statusCode: 401);
+  AuthException(super.message) : super(statusCode: 401);
 }
 
 class ServerException extends ApiException {
-  ServerException(String message, int statusCode) 
-      : super(message, statusCode: statusCode);
+  ServerException(super.message, int statusCode) 
+      : super(statusCode: statusCode);
 }
 
 class ValidationException extends ApiException {
   final Map<String, List<String>>? errors;
 
-  ValidationException(String message, {this.errors}) : super(message);
+  ValidationException(super.message, {this.errors});
 }

@@ -95,11 +95,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     ),
                   ],
                 ),
-                child: const Icon(
-                  Icons.directions_bus,
-                  size: 60,
-                  color: AppColors.primary,
-                ),
+                child: Image.asset(
+                  'assets/images/icon.png'
+                )
               ),
               const SizedBox(height: 24),
               

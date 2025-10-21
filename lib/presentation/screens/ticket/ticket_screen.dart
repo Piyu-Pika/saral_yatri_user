@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../providers/ticket_provider.dart';
 import '../../widgets/qr_code_widget.dart';
 
 class TicketScreen extends ConsumerStatefulWidget {
@@ -16,89 +15,19 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
   @override
   void initState() {
     super.initState();
+    // Redirect to the new my tickets screen
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(ticketProvider.notifier).loadUserTickets();
+      Navigator.pushReplacementNamed(context, '/my-tickets');
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final ticketState = ref.watch(ticketProvider);
-    
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Tickets'),
-        backgroundColor: AppTheme.primaryColor,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              ref.read(ticketProvider.notifier).loadUserTickets();
-            },
-          ),
-        ],
+    // Show loading while redirecting
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
       ),
-      body: ticketState.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ticketState.tickets.isEmpty
-              ? const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.confirmation_number_outlined,
-                        size: 64,
-                        color: AppTheme.textSecondary,
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        'No tickets found',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: AppTheme.textSecondary,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Book your first ticket to get started',
-                        style: TextStyle(
-                          color: AppTheme.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: ticketState.tickets.length,
-                  itemBuilder: (context, index) {
-                    final ticket = ticketState.tickets[index];
-                    return TicketCard(
-                      ticket: ticket,
-                      onTap: () {
-                        ref.read(ticketProvider.notifier).setCurrentTicket(ticket);
-                        _showTicketDetails(context, ticket);
-                      },
-                    );
-                  },
-                ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, '/booking');
-        },
-        backgroundColor: AppTheme.primaryColor,
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
-    );
-  }
-
-  void _showTicketDetails(BuildContext context, ticket) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => TicketDetailsModal(ticket: ticket),
     );
   }
 }

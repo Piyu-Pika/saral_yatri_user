@@ -93,6 +93,17 @@ class _StationDropdownState extends ConsumerState<StationDropdown> {
   @override
   Widget build(BuildContext context) {
     final stationState = ref.watch(stationProvider);
+    
+    // Update filtered stations when stations change
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (stationState.stations.isNotEmpty) {
+        _filterStations(_searchController.text);
+      } else {
+        setState(() {
+          _filteredStations = [];
+        });
+      }
+    });
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,24 +198,38 @@ class _StationDropdownState extends ConsumerState<StationDropdown> {
                   constraints: const BoxConstraints(maxHeight: 300),
                   child: Column(
                     children: [
-                      // Search field
+                      // Search field with refresh button
                       Padding(
                         padding: const EdgeInsets.all(12),
-                        child: TextField(
-                          controller: _searchController,
-                          onChanged: _filterStations,
-                          decoration: InputDecoration(
-                            hintText: 'Search stations...',
-                            prefixIcon: const Icon(Icons.search, size: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _searchController,
+                                onChanged: _filterStations,
+                                decoration: InputDecoration(
+                                  hintText: 'Search stations...',
+                                  prefixIcon: const Icon(Icons.search, size: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide(color: Colors.grey[300]!),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                ),
+                              ),
                             ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
+                            const SizedBox(width: 8),
+                            IconButton(
+                              onPressed: () {
+                                _filterStations(_searchController.text);
+                              },
+                              icon: const Icon(Icons.refresh, size: 20),
+                              tooltip: 'Refresh stations',
                             ),
-                          ),
+                          ],
                         ),
                       ),
 
@@ -215,13 +240,33 @@ class _StationDropdownState extends ConsumerState<StationDropdown> {
                                 child: CircularProgressIndicator(),
                               )
                             : _filteredStations.isEmpty
-                                ? const Padding(
-                                    padding: EdgeInsets.all(16),
-                                    child: Text(
-                                      'No stations found',
-                                      style: TextStyle(
-                                        color: AppColors.textSecondary,
-                                      ),
+                                ? Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Column(
+                                      children: [
+                                        const Text(
+                                          'No stations found',
+                                          style: TextStyle(
+                                            color: AppColors.textSecondary,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          'Total stations: ${stationState.stations.length}',
+                                          style: const TextStyle(
+                                            color: AppColors.textSecondary,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        if (stationState.error != null)
+                                          Text(
+                                            'Error: ${stationState.error}',
+                                            style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                      ],
                                     ),
                                   )
                                 : ListView.builder(

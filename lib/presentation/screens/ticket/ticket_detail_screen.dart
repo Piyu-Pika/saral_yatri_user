@@ -3,9 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:screen_protector/screen_protector.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/ticket_model.dart';
+import '../../../data/models/enhanced_ticket_model.dart';
+import '../../../core/services/mock_ticket_service.dart';
 import '../../widgets/common/custom_app_bar.dart';
 import '../../widgets/ticket/ticket_card.dart';
 import '../../widgets/ticket/qr_display.dart';
+import 'qr_ticket_screen.dart';
 
 class TicketDetailScreen extends ConsumerStatefulWidget {
   final TicketModel ticket;
@@ -52,13 +55,45 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
     }
   }
 
+  void _showEnhancedQRTicket() {
+    // Convert regular ticket to enhanced ticket for QR display
+    final enhancedTicket = _convertToEnhancedTicket(widget.ticket);
+    
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => QrTicketScreen(ticket: enhancedTicket),
+      ),
+    );
+  }
+
+  EnhancedTicketModel _convertToEnhancedTicket(TicketModel ticket) {
+    // Create enhanced ticket from regular ticket data
+    return MockTicketService.createMockEnhancedTicket(
+      busId: ticket.busId,
+      routeId: ticket.routeId,
+      boardingStationId: ticket.boardingStop,
+      destinationStationId: ticket.droppingStop,
+      paymentMethod: ticket.paymentMethod,
+      ticketType: 'single',
+      travelDate: ticket.bookingTime,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
         title: 'Ticket Details',
         actions: [
-          if (widget.ticket.isActive)
+          if (widget.ticket.isActive) ...[
+            IconButton(
+              icon: const Icon(Icons.qr_code),
+              onPressed: () {
+                // Convert to enhanced ticket and show QR screen
+                _showEnhancedQRTicket();
+              },
+            ),
             IconButton(
               icon: const Icon(Icons.share),
               onPressed: () {
@@ -69,6 +104,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                 );
               },
             ),
+          ],
         ],
       ),
       body: SingleChildScrollView(

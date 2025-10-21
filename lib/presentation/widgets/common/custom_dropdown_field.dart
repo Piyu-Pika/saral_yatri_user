@@ -34,7 +34,7 @@ class CustomDropdownField<T> extends StatefulWidget {
 class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  bool _isFocused = false;
+  final bool _isFocused = false;
   bool _hasError = false;
 
   @override
@@ -87,7 +87,7 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>>
                 : null,
           ),
           child: DropdownButtonFormField<T>(
-            value: widget.value,
+            initialValue: widget.value,
             items: widget.items,
             onChanged: widget.enabled ? widget.onChanged : null,
             validator: (value) {
