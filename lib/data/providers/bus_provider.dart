@@ -165,7 +165,7 @@ class BusNotifier extends StateNotifier<BusState> {
       AppLogger.info('Loading stations for route: $routeId');
       
       final response = await _apiService.get(
-        '${ApiConstants.routeStations}/$routeId/stations',
+        '${ApiConstants.routeActiveStations}/$routeId/stations/active',
       );
 
       AppLogger.info('Route stations API response: ${response.data}');

@@ -20,6 +20,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _isPasswordVisible = false;
 
   @override
+  void initState() {
+    super.initState();
+    // Pre-fill test credentials for easier testing
+    _emailController.text = 'user';
+    _passwordController.text = 'user123';
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();

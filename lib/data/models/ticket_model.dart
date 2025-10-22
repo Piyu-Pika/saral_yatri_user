@@ -18,6 +18,16 @@ class TicketModel {
   final String status; // active, expired, used
   final bool isVerified;
   final DateTime? verificationTime;
+  
+  // Additional fields from API
+  final String? ticketNumber;
+  final String? ticketType;
+  final DateTime? travelDate;
+  final String? boardingStationId;
+  final String? destinationStationId;
+  final double? taxAmount;
+  final String? transactionId;
+  final String? encryptedToken;
 
   TicketModel({
     required this.id,
@@ -39,32 +49,102 @@ class TicketModel {
     required this.status,
     required this.isVerified,
     this.verificationTime,
+    this.ticketNumber,
+    this.ticketType,
+    this.travelDate,
+    this.boardingStationId,
+    this.destinationStationId,
+    this.taxAmount,
+    this.transactionId,
+    this.encryptedToken,
   });
 
   factory TicketModel.fromJson(Map<String, dynamic> json) {
+    // Handle the nested API response structure
+    final ticketData = json['ticket'] ?? json;
+    final qrData = json['qr_data'] ?? {};
+    final fareDetails = ticketData['fare_details'] ?? {};
+    final paymentDetails = ticketData['payment_details'] ?? {};
+    
+    // Extract basic ticket information
+    final ticketId = ticketData['id'] ?? ticketData['ticket_id'] ?? qrData['ticket_id'] ?? '';
+    final passengerId = ticketData['passenger_id'] ?? qrData['passenger_id'] ?? '';
+    final busId = ticketData['bus_id'] ?? qrData['bus_id'] ?? '';
+    final routeId = ticketData['route_id'] ?? qrData['route_id'] ?? '';
+    final boardingStationId = ticketData['boarding_station_id'] ?? qrData['boarding_station_id'] ?? '';
+    final destinationStationId = ticketData['destination_station_id'] ?? qrData['destination_station_id'] ?? '';
+    
+    // Extract fare information from fare_details or qr_data
+    final baseFare = (fareDetails['base_fare'] ?? fareDetails['gross_fare'] ?? qrData['fare_amount'] ?? 0.0).toDouble();
+    final subsidyAmount = (fareDetails['total_subsidy_amount'] ?? qrData['subsidy_amount'] ?? 0.0).toDouble();
+    final finalAmount = (fareDetails['final_amount'] ?? qrData['fare_amount'] ?? baseFare).toDouble();
+    
+    // Extract payment information
+    final paymentMode = paymentDetails['payment_mode'] ?? paymentDetails['payment_method'] ?? '';
+    final paymentStatus = paymentDetails['payment_status'] ?? 'completed';
+    
+    // Extract dates
+    final bookingTime = ticketData['booking_time'] ?? ticketData['created_at'] ?? DateTime.now().toIso8601String();
+    final validUntil = ticketData['valid_until'] ?? qrData['valid_until'] ?? DateTime.now().add(const Duration(hours: 24)).toIso8601String();
+    
+    // Extract QR code information
+    final qrToken = ticketData['qr_token'] ?? ticketData['encrypted_token'] ?? '';
+    
+    // Extract status and verification
+    final status = ticketData['status'] ?? 'booked';
+    final isVerified = ticketData['is_verified'] ?? false;
+    
     return TicketModel(
-      id: json['id'] ?? json['ticket_id'] ?? '',
-      userId: json['user_id'] ?? json['passenger_id'] ?? '',
-      busId: json['bus_id'] ?? '',
-      busNumber: json['bus_number'] ?? json['bus_id'] ?? '',
-      routeId: json['route_id'] ?? '',
-      routeName: json['route_name'] ?? json['route_id'] ?? '',
-      boardingStop: json['boarding_stop'] ?? json['boarding_station_id'] ?? '',
-      droppingStop: json['dropping_stop'] ?? json['destination_station_id'] ?? '',
-      originalFare: (json['original_fare'] ?? json['base_fare'] ?? 0.0).toDouble(),
-      subsidyAmount: (json['subsidy_amount'] ?? json['total_subsidy_amount'] ?? 0.0).toDouble(),
-      finalFare: (json['final_fare'] ?? json['final_amount'] ?? 0.0).toDouble(),
-      paymentMethod: json['payment_method'] ?? json['payment_mode'] ?? '',
-      paymentStatus: json['payment_status'] ?? 'completed',
-      bookingTime: DateTime.parse(json['booking_time'] ?? json['created_at'] ?? DateTime.now().toIso8601String()),
-      expiryTime: DateTime.parse(json['expiry_time'] ?? json['valid_until'] ?? DateTime.now().add(Duration(hours: 24)).toIso8601String()),
-      qrCode: json['qr_code'] ?? json['qr_token'] ?? '',
-      status: json['status'] ?? 'active',
-      isVerified: json['is_verified'] ?? false,
-      verificationTime: json['verification_time'] != null 
-          ? DateTime.parse(json['verification_time']) 
+      id: ticketId,
+      userId: passengerId,
+      busId: busId,
+      busNumber: ticketData['bus_number'] ?? busId, // Use bus_id as fallback for display
+      routeId: routeId,
+      routeName: ticketData['route_name'] ?? routeId, // Use route_id as fallback for display
+      boardingStop: ticketData['boarding_stop'] ?? boardingStationId, // Use station_id as fallback
+      droppingStop: ticketData['dropping_stop'] ?? destinationStationId, // Use station_id as fallback
+      originalFare: baseFare,
+      subsidyAmount: subsidyAmount,
+      finalFare: finalAmount,
+      paymentMethod: paymentMode,
+      paymentStatus: paymentStatus,
+      bookingTime: DateTime.parse(bookingTime),
+      expiryTime: DateTime.parse(validUntil),
+      qrCode: qrToken,
+      status: _mapApiStatusToAppStatus(status),
+      isVerified: isVerified,
+      verificationTime: ticketData['verification_time'] != null 
+          ? DateTime.parse(ticketData['verification_time']) 
           : null,
+      // Additional fields
+      ticketNumber: ticketData['ticket_number'] ?? qrData['ticket_number'],
+      ticketType: ticketData['ticket_type'],
+      travelDate: ticketData['travel_date'] != null 
+          ? DateTime.parse(ticketData['travel_date']) 
+          : null,
+      boardingStationId: boardingStationId,
+      destinationStationId: destinationStationId,
+      taxAmount: (fareDetails['total_tax_amount'] ?? 0.0).toDouble(),
+      transactionId: paymentDetails['transaction_id'],
+      encryptedToken: ticketData['encrypted_token'],
     );
+  }
+  
+  /// Map API status values to app status values
+  static String _mapApiStatusToAppStatus(String apiStatus) {
+    switch (apiStatus.toLowerCase()) {
+      case 'booked':
+      case 'confirmed':
+        return 'active';
+      case 'expired':
+      case 'cancelled':
+        return 'expired';
+      case 'used':
+      case 'verified':
+        return 'used';
+      default:
+        return apiStatus;
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -88,11 +168,34 @@ class TicketModel {
       'status': status,
       'is_verified': isVerified,
       'verification_time': verificationTime?.toIso8601String(),
+      'ticket_number': ticketNumber,
+      'ticket_type': ticketType,
+      'travel_date': travelDate?.toIso8601String(),
+      'boarding_station_id': boardingStationId,
+      'destination_station_id': destinationStationId,
+      'tax_amount': taxAmount,
+      'transaction_id': transactionId,
+      'encrypted_token': encryptedToken,
     };
   }
 
   bool get isExpired => DateTime.now().isAfter(expiryTime);
-  bool get isActive => status == 'active' && !isExpired;
+  bool get isActive => (status == 'active' || status == 'booked') && !isExpired;
+  
+  /// Get a user-friendly display name for the ticket
+  String get displayName => ticketNumber ?? 'Ticket $id';
+  
+  /// Get formatted fare with currency
+  String get formattedFare => '₹${finalFare.toStringAsFixed(2)}';
+  
+  /// Get formatted original fare with currency
+  String get formattedOriginalFare => '₹${originalFare.toStringAsFixed(2)}';
+  
+  /// Get formatted subsidy amount with currency
+  String get formattedSubsidy => subsidyAmount > 0 ? '₹${subsidyAmount.toStringAsFixed(2)}' : '';
+  
+  /// Get route display text
+  String get routeDisplay => '$boardingStop → $droppingStop';
 
   TicketModel copyWith({
     String? id,
@@ -114,6 +217,14 @@ class TicketModel {
     String? status,
     bool? isVerified,
     DateTime? verificationTime,
+    String? ticketNumber,
+    String? ticketType,
+    DateTime? travelDate,
+    String? boardingStationId,
+    String? destinationStationId,
+    double? taxAmount,
+    String? transactionId,
+    String? encryptedToken,
   }) {
     return TicketModel(
       id: id ?? this.id,
@@ -135,6 +246,14 @@ class TicketModel {
       status: status ?? this.status,
       isVerified: isVerified ?? this.isVerified,
       verificationTime: verificationTime ?? this.verificationTime,
+      ticketNumber: ticketNumber ?? this.ticketNumber,
+      ticketType: ticketType ?? this.ticketType,
+      travelDate: travelDate ?? this.travelDate,
+      boardingStationId: boardingStationId ?? this.boardingStationId,
+      destinationStationId: destinationStationId ?? this.destinationStationId,
+      taxAmount: taxAmount ?? this.taxAmount,
+      transactionId: transactionId ?? this.transactionId,
+      encryptedToken: encryptedToken ?? this.encryptedToken,
     );
   }
 }

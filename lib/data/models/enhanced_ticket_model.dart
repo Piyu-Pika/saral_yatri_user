@@ -1,3 +1,5 @@
+import 'ticket_model.dart';
+
 class EnhancedTicketModel {
   final String id;
   final String ticketNumber;
@@ -46,8 +48,9 @@ class EnhancedTicketModel {
   });
 
   factory EnhancedTicketModel.fromJson(Map<String, dynamic> json) {
-    final ticketData = json['data']['ticket'];
-    final qrData = json['data']['qr_data'];
+    // Handle different response structures
+    final ticketData = json['data']?['ticket'] ?? json['ticket'] ?? json;
+    final qrDataRaw = json['data']?['qr_data'] ?? json['qr_data'] ?? {};
     
     return EnhancedTicketModel(
       id: ticketData['id'] ?? '',
@@ -70,7 +73,7 @@ class EnhancedTicketModel {
       paymentDetails: PaymentDetails.fromJson(ticketData['payment_details'] ?? {}),
       createdAt: DateTime.parse(ticketData['created_at'] ?? DateTime.now().toIso8601String()),
       updatedAt: DateTime.parse(ticketData['updated_at'] ?? DateTime.now().toIso8601String()),
-      qrData: QrData.fromJson(qrData ?? {}),
+      qrData: QrData.fromJson(qrDataRaw),
     );
   }
 
@@ -103,6 +106,38 @@ class EnhancedTicketModel {
   bool get isExpired => DateTime.now().isAfter(validUntil);
   bool get isActive => status == 'booked' && !isExpired;
   bool get isUsed => status == 'used';
+
+  /// Convert to TicketModel for compatibility
+  TicketModel toTicketModel() {
+    return TicketModel(
+      id: id,
+      userId: passengerId,
+      busId: busId,
+      busNumber: busId, // Will be resolved by data resolution service
+      routeId: routeId,
+      routeName: routeId, // Will be resolved by data resolution service
+      boardingStop: boardingStationId, // Will be resolved by data resolution service
+      droppingStop: destinationStationId, // Will be resolved by data resolution service
+      originalFare: fareDetails.baseFare,
+      subsidyAmount: fareDetails.totalSubsidyAmount,
+      finalFare: fareDetails.finalAmount,
+      paymentMethod: paymentDetails.paymentMode,
+      paymentStatus: paymentDetails.paymentStatus,
+      bookingTime: bookingTime,
+      expiryTime: validUntil,
+      qrCode: qrToken,
+      status: status,
+      isVerified: isVerified,
+      ticketNumber: ticketNumber,
+      ticketType: ticketType,
+      travelDate: travelDate,
+      boardingStationId: boardingStationId,
+      destinationStationId: destinationStationId,
+      taxAmount: fareDetails.totalTaxAmount,
+      transactionId: paymentDetails.transactionId,
+      encryptedToken: encryptedToken,
+    );
+  }
 }
 
 class FareDetails {
@@ -238,6 +273,8 @@ class PaymentDetails {
 }
 
 class QrData {
+  final String qrCodeBase64;
+  final String qrText;
   final String ticketId;
   final String ticketNumber;
   final String passengerId;
@@ -257,6 +294,8 @@ class QrData {
   final String timestamp;
 
   QrData({
+    required this.qrCodeBase64,
+    required this.qrText,
     required this.ticketId,
     required this.ticketNumber,
     required this.passengerId,
@@ -278,6 +317,8 @@ class QrData {
 
   factory QrData.fromJson(Map<String, dynamic> json) {
     return QrData(
+      qrCodeBase64: json['qr_code_base64'] ?? '',
+      qrText: json['qr_text'] ?? '',
       ticketId: json['ticket_id'] ?? '',
       ticketNumber: json['ticket_number'] ?? '',
       passengerId: json['passenger_id'] ?? '',
@@ -300,6 +341,8 @@ class QrData {
 
   Map<String, dynamic> toJson() {
     return {
+      'qr_code_base64': qrCodeBase64,
+      'qr_text': qrText,
       'ticket_id': ticketId,
       'ticket_number': ticketNumber,
       'passenger_id': passengerId,

@@ -291,7 +291,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     }
   }
 
-  Future<void> _proceedToPayment() async {
+  Future<void> _bookTicket() async {
     if (_selectedBus == null ||
         _selectedBoardingStation == null ||
         _selectedDropStation == null) {
@@ -328,45 +328,105 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       return;
     }
 
-    // Show confirmation dialog for high amounts
-    if (finalAmount > 500) {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Confirm Payment'),
-          content: Text(
-            'You are about to pay ₹${finalAmount.toStringAsFixed(2)}. Do you want to proceed?',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Proceed'),
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Booking'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Bus: ${_selectedBus!.busNumber}'),
+            Text('Route: ${_selectedBus!.routeName}'),
+            Text('From: ${_selectedBoardingStation!.name}'),
+            Text('To: ${_selectedDropStation!.name}'),
+            Text('Ticket Type: ${_selectedTicketType.toUpperCase()}'),
+            Text('Payment Method: ${_getPaymentMethodDisplayName(_selectedPaymentMethod)}'),
+            const SizedBox(height: 8),
+            Text(
+              'Total Amount: ₹${finalAmount.toStringAsFixed(2)}',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
           ],
         ),
-      );
-      
-      if (confirmed != true) return;
-    }
-
-    // Navigate to payment screen with booking details
-    Navigator.pushNamed(
-      context,
-      '/payment',
-      arguments: {
-        'bus': _selectedBus!,
-        'boardingStation': _selectedBoardingStation!,
-        'dropStation': _selectedDropStation!,
-        'ticketType': _selectedTicketType,
-        'paymentMethod': _selectedPaymentMethod,
-        'fareData': ticketState.fareCalculation!,
-        'travelDate': DateTime.now(),
-      },
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Book Ticket'),
+          ),
+        ],
+      ),
     );
+    
+    if (confirmed != true) return;
+
+    // Book the ticket using the enhanced booking method
+    try {
+      final success = await ref.read(ticketProvider.notifier).bookEnhancedTicket(
+        busId: _selectedBus!.id,
+        routeId: _selectedBus!.routeId,
+        boardingStationId: _selectedBoardingStation!.id,
+        droppingStationId: _selectedDropStation!.id,
+        paymentMethod: _selectedPaymentMethod,
+        ticketType: _selectedTicketType,
+        travelDate: DateTime.now(),
+      );
+
+      if (success) {
+        // Show success message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Ticket booked successfully!'),
+              backgroundColor: AppTheme.successColor,
+            ),
+          );
+        }
+
+        // Navigate to ticket screen with the booked ticket
+        final bookedTicket = ref.read(ticketProvider).currentEnhancedTicket;
+        if (bookedTicket != null && mounted) {
+          Navigator.pushReplacementNamed(
+            context,
+            '/qr-ticket',
+            arguments: {
+              'ticket': bookedTicket,
+              'showSuccessMessage': true,
+            },
+          );
+        } else {
+          // Fallback: navigate to my tickets screen
+          Navigator.pushReplacementNamed(context, '/my-tickets');
+        }
+      } else {
+        // Error handling is done in the provider, just show a generic message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to book ticket. Please try again.'),
+              backgroundColor: AppTheme.errorColor,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Booking failed: ${e.toString()}'),
+            backgroundColor: AppTheme.errorColor,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -1092,12 +1152,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   ),
                 ),
 
-              // Proceed to Payment Button
+              // Book Ticket Button
               CustomButton(
                 text: _selectedBus != null && !_selectedBus!.isActive
                     ? 'Bus Inactive - Cannot Book'
                     : ticketState.fareCalculation != null
-                        ? 'Proceed to Payment - ₹${(ticketState.fareCalculation!['final_amount'] ?? 0.0).toStringAsFixed(2)}'
+                        ? 'Book Ticket - ₹${(ticketState.fareCalculation!['final_amount'] ?? 0.0).toStringAsFixed(2)}'
                         : 'Calculate Fare First',
                 onPressed: (ticketState.isLoading ||
                         (_selectedBus != null && !_selectedBus!.isActive) ||
@@ -1105,7 +1165,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         _selectedBoardingStation == null ||
                         _selectedDropStation == null)
                     ? null
-                    : _proceedToPayment,
+                    : _bookTicket,
                 isLoading: ticketState.isLoading,
               ),
             ],

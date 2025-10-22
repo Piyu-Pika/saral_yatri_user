@@ -29,23 +29,22 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   DateTime? _travelDate;
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final args =
-          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-      if (args != null) {
-        setState(() {
-          _bus = args['bus'] as BusModel?;
-          _boardingStation = args['boardingStation'] as StationModel?;
-          _dropStation = args['dropStation'] as StationModel?;
-          _ticketType = args['ticketType'] as String? ?? 'single';
-          _paymentMethod = args['paymentMethod'] as String? ?? 'digital';
-          _fareData = args['fareData'] as Map<String, dynamic>?;
-          _travelDate = args['travelDate'] as DateTime?;
-        });
-      }
-    });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    // Get arguments from route
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (args != null && _bus == null) {
+      setState(() {
+        _bus = args['bus'] as BusModel?;
+        _boardingStation = args['boardingStation'] as StationModel?;
+        _dropStation = args['dropStation'] as StationModel?;
+        _ticketType = args['ticketType'] as String? ?? 'single';
+        _paymentMethod = args['paymentMethod'] as String? ?? 'upi';
+        _fareData = args['fareData'] as Map<String, dynamic>?;
+        _travelDate = args['travelDate'] as DateTime?;
+      });
+    }
   }
 
   String _getPaymentMethodDisplayName(String method) {
@@ -202,10 +201,20 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   }
 
   Future<void> _processPayment() async {
+    print('🔍 DEBUG: Starting payment process...');
+    print('🔍 DEBUG: Bus: ${_bus?.id} (${_bus?.busNumber})');
+    print('🔍 DEBUG: Boarding: ${_boardingStation?.id} (${_boardingStation?.name})');
+    print('🔍 DEBUG: Drop: ${_dropStation?.id} (${_dropStation?.name})');
+    print('🔍 DEBUG: Fare Data: $_fareData');
+    print('🔍 DEBUG: Payment Method: $_paymentMethod');
+    print('🔍 DEBUG: Ticket Type: $_ticketType');
+    print('🔍 DEBUG: Travel Date: $_travelDate');
+    
     if (_bus == null ||
         _boardingStation == null ||
         _dropStation == null ||
         _fareData == null) {
+      print('❌ DEBUG: Missing booking information!');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Missing booking information'),
@@ -262,12 +271,16 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
           apiPaymentMode = 'upi'; // Default to UPI
       }
 
-      // Step 4: Try enhanced booking first, fallback to regular booking
+      // Step 4: Book the ticket
+      print('🎫 DEBUG: Starting ticket booking...');
+      print('🎫 DEBUG: API Payment Mode: $apiPaymentMode');
+      
       bool success = false;
       EnhancedTicketModel? enhancedTicket;
       
       try {
-        // Try enhanced booking for QR data
+        // Try enhanced booking first for QR data
+        print('🎫 DEBUG: Attempting enhanced booking...');
         success = await ref.read(ticketProvider.notifier).bookEnhancedTicket(
               busId: _bus!.id,
               routeId: _bus!.routeId,
@@ -278,21 +291,32 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
               travelDate: _travelDate ?? DateTime.now(),
             );
         
+        print('🎫 DEBUG: Enhanced booking success: $success');
+        
         if (success) {
           final currentState = ref.read(ticketProvider);
           enhancedTicket = currentState.currentEnhancedTicket;
+          print('🎫 DEBUG: Enhanced ticket received: ${enhancedTicket?.id}');
         }
       } catch (e) {
+        print('❌ DEBUG: Enhanced booking failed: $e');
         // Fallback to regular booking
-        success = await ref.read(ticketProvider.notifier).bookTicket(
-              busId: _bus!.id,
-              routeId: _bus!.routeId,
-              boardingStationId: _boardingStation!.id,
-              droppingStationId: _dropStation!.id,
-              paymentMethod: apiPaymentMode,
-              ticketType: _ticketType,
-              travelDate: _travelDate ?? DateTime.now(),
-            );
+        try {
+          print('🎫 DEBUG: Attempting regular booking fallback...');
+          success = await ref.read(ticketProvider.notifier).bookTicket(
+                busId: _bus!.id,
+                routeId: _bus!.routeId,
+                boardingStationId: _boardingStation!.id,
+                droppingStationId: _dropStation!.id,
+                paymentMethod: apiPaymentMode,
+                ticketType: _ticketType,
+                travelDate: _travelDate ?? DateTime.now(),
+              );
+          print('🎫 DEBUG: Regular booking success: $success');
+        } catch (fallbackError) {
+          print('❌ DEBUG: Regular booking also failed: $fallbackError');
+          throw fallbackError;
+        }
       }
 
       if (success && mounted) {

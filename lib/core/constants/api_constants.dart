@@ -20,7 +20,8 @@ class ApiConstants {
   static const String activeRoutes = '/routes/active';
   static const String routeById = '/routes';
   static const String routeFare = '/routes/fare';
-  static const String routeStations = '/routes'; // /routes/{route_id}/stations
+  static const String routeStations = '/routes'; // /routes/{route_id}/stations/active
+  static const String routeActiveStations = '/routes'; // /routes/{route_id}/stations/active
 
   // Station Endpoints
   static const String activeStations = '/stations/active';
@@ -31,7 +32,10 @@ class ApiConstants {
   // Ticket Endpoints
   static const String bookTicket = '/tickets/passenger/book';
   static const String myTickets = '/tickets/passenger/my-tickets';
+  static const String myActiveTickets = '/tickets/passenger/my-active-tickets';
   static const String ticketDetails = '/tickets/passenger';
+  static const String ticketStatus = '/tickets/passenger'; // /tickets/passenger/{id}/status
+  static const String ticketIsActive = '/tickets/passenger'; // /tickets/passenger/{id}/is-active
   static const String calculateFare = '/tickets/calculate-fare';
 
   // Headers

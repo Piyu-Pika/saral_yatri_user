@@ -3,6 +3,7 @@ import 'package:dev_log/dev_log.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import '../../data/models/ticket_model.dart';
 import '../../data/models/enhanced_ticket_model.dart';
+import '../../data/models/enhanced_ticket_display_model.dart';
 import '../../data/repositories/ticket_repository.dart';
 
 final ticketRepositoryProvider = Provider<TicketRepository>((ref) => TicketRepository());
@@ -13,35 +14,43 @@ final ticketProvider = StateNotifierProvider<TicketNotifier, TicketState>((ref) 
 
 class TicketState {
   final List<TicketModel> tickets;
+  final List<EnhancedTicketDisplayModel> enhancedTickets;
   final TicketModel? currentTicket;
   final EnhancedTicketModel? currentEnhancedTicket;
   final bool isLoading;
+  final bool isLoadingEnhanced;
   final String? error;
   final Map<String, dynamic>? fareCalculation;
 
   TicketState({
     this.tickets = const [],
+    this.enhancedTickets = const [],
     this.currentTicket,
     this.currentEnhancedTicket,
     this.isLoading = false,
+    this.isLoadingEnhanced = false,
     this.error,
     this.fareCalculation,
   });
 
   TicketState copyWith({
     List<TicketModel>? tickets,
+    List<EnhancedTicketDisplayModel>? enhancedTickets,
     TicketModel? currentTicket,
     EnhancedTicketModel? currentEnhancedTicket,
     bool? isLoading,
+    bool? isLoadingEnhanced,
     String? error,
     Map<String, dynamic>? fareCalculation,
     bool clearError = false,
   }) {
     return TicketState(
       tickets: tickets ?? this.tickets,
+      enhancedTickets: enhancedTickets ?? this.enhancedTickets,
       currentTicket: currentTicket ?? this.currentTicket,
       currentEnhancedTicket: currentEnhancedTicket ?? this.currentEnhancedTicket,
       isLoading: isLoading ?? this.isLoading,
+      isLoadingEnhanced: isLoadingEnhanced ?? this.isLoadingEnhanced,
       error: clearError ? null : (error ?? this.error),
       fareCalculation: fareCalculation ?? this.fareCalculation,
     );
@@ -57,10 +66,14 @@ class TicketNotifier extends StateNotifier<TicketState> {
     state = state.copyWith(isLoading: true, clearError: true);
     
     try {
+      Log.i('Loading user tickets from API...');
       final tickets = await _ticketRepository.getUserTickets();
+      
+      Log.i('Successfully loaded ${tickets.length} tickets from API');
       
       // If no tickets from API, add some mock tickets for demo
       if (tickets.isEmpty) {
+        Log.i('No tickets found from API, showing mock tickets for demo');
         final mockTickets = _generateMockTickets();
         state = state.copyWith(
           tickets: mockTickets,
@@ -73,13 +86,24 @@ class TicketNotifier extends StateNotifier<TicketState> {
         );
       }
     } catch (e) {
-      // If API fails, show mock tickets for demo
-      Log.w('API failed, showing mock tickets: $e');
+      Log.e('Failed to load tickets from API: $e');
+      
+      // Check if it's an authentication error
+      if (e.toString().contains('log in again') || e.toString().contains('unauthorized')) {
+        state = state.copyWith(
+          isLoading: false,
+          error: 'Please log in again to view your tickets.',
+        );
+        return;
+      }
+      
+      // For other errors, show mock tickets for demo but also show the error
+      Log.w('API failed, showing mock tickets for demo: $e');
       final mockTickets = _generateMockTickets();
       state = state.copyWith(
         tickets: mockTickets,
         isLoading: false,
-        clearError: true,
+        error: 'Using demo data: ${e.toString()}',
       );
     }
   }
@@ -317,5 +341,118 @@ class TicketNotifier extends StateNotifier<TicketState> {
 
   void clearFareCalculation() {
     state = state.copyWith(fareCalculation: null);
+  }
+
+  /// Force refresh tickets from API without fallback to mock data
+  Future<void> refreshUserTickets() async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    
+    try {
+      Log.i('Force refreshing user tickets from API...');
+      final tickets = await _ticketRepository.getUserTickets();
+      
+      Log.i('Successfully refreshed ${tickets.length} tickets from API');
+      
+      state = state.copyWith(
+        tickets: tickets,
+        isLoading: false,
+      );
+    } catch (e) {
+      Log.e('Failed to refresh tickets from API: $e');
+      
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString(),
+      );
+    }
+  }
+
+  /// Load user tickets with resolved names (station names, bus numbers, route names)
+  Future<void> loadUserTicketsWithResolvedNames() async {
+    state = state.copyWith(isLoadingEnhanced: true, clearError: true);
+    
+    try {
+      Log.i('Loading user tickets with resolved names from API...');
+      final enhancedTickets = await _ticketRepository.getUserTicketsWithResolvedNames();
+      
+      Log.i('Successfully loaded ${enhancedTickets.length} enhanced tickets from API');
+      
+      // If no tickets from API, create enhanced versions of mock tickets
+      if (enhancedTickets.isEmpty) {
+        Log.i('No tickets found from API, creating enhanced mock tickets for demo');
+        final mockTickets = _generateMockTickets();
+        final enhancedMockTickets = mockTickets.map((ticket) => 
+          EnhancedTicketDisplayModel.fromTicket(ticket)
+        ).toList();
+        
+        state = state.copyWith(
+          tickets: mockTickets,
+          enhancedTickets: enhancedMockTickets,
+          isLoadingEnhanced: false,
+        );
+      } else {
+        // Extract regular tickets from enhanced tickets
+        final regularTickets = enhancedTickets.map((enhanced) => enhanced.ticket).toList();
+        
+        state = state.copyWith(
+          tickets: regularTickets,
+          enhancedTickets: enhancedTickets,
+          isLoadingEnhanced: false,
+        );
+      }
+    } catch (e) {
+      Log.e('Failed to load enhanced tickets from API: $e');
+      
+      // Check if it's an authentication error
+      if (e.toString().contains('log in again') || e.toString().contains('unauthorized')) {
+        state = state.copyWith(
+          isLoadingEnhanced: false,
+          error: 'Please log in again to view your tickets.',
+        );
+        return;
+      }
+      
+      // For other errors, show mock tickets for demo but also show the error
+      Log.w('API failed, showing enhanced mock tickets for demo: $e');
+      final mockTickets = _generateMockTickets();
+      final enhancedMockTickets = mockTickets.map((ticket) => 
+        EnhancedTicketDisplayModel.fromTicket(ticket)
+      ).toList();
+      
+      state = state.copyWith(
+        tickets: mockTickets,
+        enhancedTickets: enhancedMockTickets,
+        isLoadingEnhanced: false,
+        error: 'Using demo data: ${e.toString()}',
+      );
+    }
+  }
+
+  /// Force refresh enhanced tickets from API without fallback to mock data
+  Future<void> refreshUserTicketsWithResolvedNames() async {
+    state = state.copyWith(isLoadingEnhanced: true, clearError: true);
+    
+    try {
+      Log.i('Force refreshing enhanced user tickets from API...');
+      final enhancedTickets = await _ticketRepository.getUserTicketsWithResolvedNames();
+      
+      Log.i('Successfully refreshed ${enhancedTickets.length} enhanced tickets from API');
+      
+      // Extract regular tickets from enhanced tickets
+      final regularTickets = enhancedTickets.map((enhanced) => enhanced.ticket).toList();
+      
+      state = state.copyWith(
+        tickets: regularTickets,
+        enhancedTickets: enhancedTickets,
+        isLoadingEnhanced: false,
+      );
+    } catch (e) {
+      Log.e('Failed to refresh enhanced tickets from API: $e');
+      
+      state = state.copyWith(
+        isLoadingEnhanced: false,
+        error: e.toString(),
+      );
+    }
   }
 }

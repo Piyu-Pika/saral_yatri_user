@@ -128,7 +128,7 @@ class BookingOptionsDrawer extends StatelessWidget {
                   subtitle: const Text('View your past bookings'),
                   onTap: () {
                     Navigator.pop(context);
-                    // TODO: Navigate to history screen
+                    Navigator.pushNamed(context, '/booking-history');
                   },
                 ),
                 
@@ -141,7 +141,7 @@ class BookingOptionsDrawer extends StatelessWidget {
                   subtitle: const Text('Get help with booking'),
                   onTap: () {
                     Navigator.pop(context);
-                    // TODO: Navigate to help screen
+                    Navigator.pushNamed(context, '/help-support');
                   },
                 ),
               ],

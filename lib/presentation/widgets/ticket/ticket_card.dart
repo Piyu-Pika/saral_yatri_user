@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/ticket_model.dart';
+import '../../../data/models/enhanced_ticket_display_model.dart';
 
 class TicketCardWidget extends StatelessWidget {
   final TicketModel ticket;
+  final EnhancedTicketDisplayModel? enhancedTicket;
   final bool showFullDetails;
 
   const TicketCardWidget({
     super.key,
     required this.ticket,
+    this.enhancedTicket,
     this.showFullDetails = true,
   });
 
@@ -17,7 +20,7 @@ class TicketCardWidget extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        gradient: ticket.isExpired 
+        gradient: ticket.isExpired
             ? LinearGradient(
                 colors: [
                   AppColors.error.withValues(alpha: 0.8),
@@ -56,7 +59,8 @@ class TicketCardWidget extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
@@ -75,24 +79,36 @@ class TicketCardWidget extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                // Journey info
+                // Journey info with resolved names
                 Row(
                   children: [
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'FROM',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
-                            ),
+                          Row(
+                            children: [
+                              const Text(
+                                'FROM',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              if (enhancedTicket?.isDataResolved == true) ...[
+                                const SizedBox(width: 4),
+                                Icon(
+                                  Icons.check_circle,
+                                  size: 10,
+                                  color: Colors.white.withValues(alpha: 0.8),
+                                ),
+                              ],
+                            ],
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            ticket.boardingStop,
+                            _getBoardingStationName(),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,
@@ -128,7 +144,7 @@ class TicketCardWidget extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            ticket.droppingStop,
+                            _getDestinationStationName(),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,
@@ -153,13 +169,14 @@ class TicketCardWidget extends StatelessWidget {
 
                   const SizedBox(height: 20),
 
-                  // Details row
+                  // Details row with resolved names
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildDetailColumn('BUS', ticket.busNumber),
-                      _buildDetailColumn('TICKET', ticket.id),
-                      _buildDetailColumn('FARE', '₹${ticket.finalFare.toStringAsFixed(0)}'),
+                      _buildDetailColumn('BUS', _getBusNumber()),
+                      _buildDetailColumn('TICKET', _getTicketNumber()),
+                      _buildDetailColumn(
+                          'FARE', '₹${ticket.finalFare.toStringAsFixed(0)}'),
                     ],
                   ),
 
@@ -240,6 +257,22 @@ class TicketCardWidget extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _getBoardingStationName() {
+    return enhancedTicket?.boardingStationName ?? ticket.boardingStop;
+  }
+
+  String _getDestinationStationName() {
+    return enhancedTicket?.destinationStationName ?? ticket.droppingStop;
+  }
+
+  String _getBusNumber() {
+    return enhancedTicket?.busNumber ?? ticket.busNumber;
+  }
+
+  String _getTicketNumber() {
+    return ticket.ticketNumber ?? ticket.id.substring(0, 8).toUpperCase();
   }
 }
 

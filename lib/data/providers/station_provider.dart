@@ -159,4 +159,45 @@ class StationNotifier extends StateNotifier<StationState> {
       state = state.copyWith(error: e.toString());
     }
   }
+
+  /// Load active stations for a specific route using the new endpoint
+  Future<void> loadActiveStationsByRoute(String routeId) async {
+    state = state.copyWith(isLoading: true);
+
+    try {
+      final response = await _apiService.get('/routes/$routeId/stations/active');
+      
+      List<dynamic> stationsData;
+      if (response.data['data'] is List) {
+        stationsData = response.data['data'] as List;
+      } else {
+        stationsData = [];
+      }
+      
+      final stations = <StationModel>[];
+      for (int i = 0; i < stationsData.length; i++) {
+        try {
+          final stationData = stationsData[i];
+          // The backend returns station with distance_from_start
+          final station = StationModel.fromJson(stationData['station'], sequence: i + 1);
+          stations.add(station);
+        } catch (e) {
+          print('Error parsing route station at index $i: $e');
+        }
+      }
+
+      // Sort by sequence/distance
+      stations.sort((a, b) => a.sequence.compareTo(b.sequence));
+
+      state = state.copyWith(
+        stations: stations,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString(),
+      );
+    }
+  }
 }

@@ -1,30 +1,28 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../data/models/ticket_model.dart';
 import '../../../data/models/enhanced_ticket_display_model.dart';
-import '../../../core/utils/ticket_utils.dart';
 
-class TicketListItemWidget extends StatelessWidget {
-  final TicketModel ticket;
-  final EnhancedTicketDisplayModel? enhancedTicket;
+class EnhancedTicketListItemWidget extends StatelessWidget {
+  final EnhancedTicketDisplayModel enhancedTicket;
   final VoidCallback onTap;
 
-  const TicketListItemWidget({
+  const EnhancedTicketListItemWidget({
     super.key,
-    required this.ticket,
-    this.enhancedTicket,
+    required this.enhancedTicket,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final ticket = enhancedTicket.ticket;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: ticket.isExpired 
-              ? AppColors.error.withValues(alpha: 0.3) 
+          color: ticket.isExpired
+              ? AppColors.error.withValues(alpha: 0.3)
               : AppColors.primary.withValues(alpha: 0.3),
           width: 1,
         ),
@@ -45,13 +43,17 @@ class TicketListItemWidget extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: (ticket.isExpired ? AppColors.error : AppColors.primary)
+                        color: (ticket.isExpired
+                                ? AppColors.error
+                                : AppColors.primary)
                             .withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
                         Icons.confirmation_number,
-                        color: ticket.isExpired ? AppColors.error : AppColors.primary,
+                        color: ticket.isExpired
+                            ? AppColors.error
+                            : AppColors.primary,
                         size: 20,
                       ),
                     ),
@@ -60,28 +62,16 @@ class TicketListItemWidget extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: [
-                              Text(
-                                _getBusDisplay(),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                              if (enhancedTicket?.isDataResolved == true) ...[
-                                const SizedBox(width: 4),
-                                Icon(
-                                  Icons.check_circle,
-                                  size: 12,
-                                  color: AppColors.success.withValues(alpha: 0.7),
-                                ),
-                              ],
-                            ],
+                          Text(
+                            enhancedTicket.busDisplay,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
                           Text(
-                            _getTicketDisplay(),
+                            enhancedTicket.ticketTitle,
                             style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.textSecondary,
@@ -91,19 +81,22 @@ class TicketListItemWidget extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: ticket.isExpired 
+                        color: ticket.isExpired
                             ? AppColors.error.withValues(alpha: 0.1)
                             : AppColors.success.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        ticket.isExpired ? 'EXPIRED' : 'ACTIVE',
+                        enhancedTicket.statusDisplay,
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
-                          color: ticket.isExpired ? AppColors.error : AppColors.success,
+                          color: ticket.isExpired
+                              ? AppColors.error
+                              : AppColors.success,
                         ),
                       ),
                     ),
@@ -111,6 +104,22 @@ class TicketListItemWidget extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 12),
+
+                // Route name (if available and different from station names)
+                if (enhancedTicket.isDataResolved &&
+                    enhancedTicket.routeName.isNotEmpty &&
+                    !enhancedTicket.routeName.startsWith('Route'))
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Text(
+                      enhancedTicket.routeName,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
 
                 // Journey details with resolved names
                 Row(
@@ -127,7 +136,7 @@ class TicketListItemWidget extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            _getBoardingStationName(),
+                            enhancedTicket.boardingStationName,
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -154,7 +163,7 @@ class TicketListItemWidget extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            _getDestinationStationName(),
+                            enhancedTicket.destinationStationName,
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -170,24 +179,62 @@ class TicketListItemWidget extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                // Footer row
+                // Footer row with additional info
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      '${ticket.bookingTime.day}/${ticket.bookingTime.month}/${ticket.bookingTime.year}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${ticket.bookingTime.day}/${ticket.bookingTime.month}/${ticket.bookingTime.year}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        if (enhancedTicket.isDataResolved)
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.check_circle,
+                                size: 12,
+                                color: AppColors.success.withValues(alpha: 0.7),
+                              ),
+                              const SizedBox(width: 4),
+                              const Text(
+                                'Names resolved',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
                     ),
-                    Text(
-                      '₹${ticket.finalFare.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: ticket.isExpired ? AppColors.error : AppColors.primary,
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          enhancedTicket.formattedFare,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: ticket.isExpired
+                                ? AppColors.error
+                                : AppColors.primary,
+                          ),
+                        ),
+                        if (ticket.subsidyAmount > 0)
+                          Text(
+                            'Saved ₹${ticket.subsidyAmount.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: AppColors.success.withValues(alpha: 0.8),
+                            ),
+                          ),
+                      ],
                     ),
                   ],
                 ),
@@ -197,23 +244,5 @@ class TicketListItemWidget extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _getBusDisplay() {
-    final busNumber = enhancedTicket?.busNumber ?? ticket.busNumber;
-    return 'Bus $busNumber';
-  }
-
-  String _getTicketDisplay() {
-    final ticketNumber = ticket.ticketNumber ?? TicketUtils.getDisplayTicketNumber(ticket.id);
-    return 'Ticket #$ticketNumber';
-  }
-
-  String _getBoardingStationName() {
-    return enhancedTicket?.boardingStationName ?? ticket.boardingStop;
-  }
-
-  String _getDestinationStationName() {
-    return enhancedTicket?.destinationStationName ?? ticket.droppingStop;
   }
 }

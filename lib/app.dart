@@ -11,6 +11,10 @@ import 'presentation/screens/booking/payment_screen.dart';
 import 'presentation/screens/ticket/my_tickets_screen.dart';
 import 'presentation/screens/ticket/ticket_screen.dart';
 import 'presentation/screens/ticket/qr_ticket_screen.dart';
+import 'presentation/screens/booking/booking_history_screen.dart';
+import 'presentation/screens/profile/help_support_screen.dart';
+import 'presentation/screens/profile/about_screen.dart';
+import 'presentation/screens/debug/api_diagnostic_screen.dart';
 import 'core/services/mock_ticket_service.dart';
 
 class SaralYatriApp extends ConsumerWidget {
@@ -36,8 +40,23 @@ class SaralYatriApp extends ConsumerWidget {
         '/qr-ticket-demo': (context) => QrTicketScreen(
           ticket: MockTicketService.createMockEnhancedTicket(),
         ),
+        '/qr-ticket': (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          final ticket = args?['ticket'];
+          if (ticket != null) {
+            return QrTicketScreen(ticket: ticket);
+          }
+          // Fallback to demo ticket if no ticket provided
+          return QrTicketScreen(
+            ticket: MockTicketService.createMockEnhancedTicket(),
+          );
+        },
         '/qr-scanner': (context) => const QRScannerScreen(),
         '/profile': (context) => const ProfileScreen(),
+        '/booking-history': (context) => const BookingHistoryScreen(),
+        '/help-support': (context) => const HelpSupportScreen(),
+        '/about': (context) => const AboutScreen(),
+        '/api-diagnostics': (context) => const ApiDiagnosticScreen(),
         // '/conductor-verify': (context) => const TicketVerificationScreen(),
       },
     );

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../providers/ticket_provider.dart' as presentation_provider;
-import '../../widgets/ticket/ticket_list_item.dart';
+import '../../widgets/ticket/enhanced_ticket_list_item.dart';
 import 'ticket_detail_screen.dart';
 import 'qr_ticket_screen.dart';
 
@@ -22,11 +22,11 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Try to load tickets, but handle gracefully if API is not available
+      // Try to load tickets with resolved names, but handle gracefully if API is not available
       try {
         ref
             .read(presentation_provider.ticketProvider.notifier)
-            .loadUserTickets();
+            .loadUserTicketsWithResolvedNames();
       } catch (e) {
         // For demo purposes, add some mock tickets
         _addMockTickets();
@@ -61,7 +61,7 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen>
             onPressed: () {
               ref
                   .read(presentation_provider.ticketProvider.notifier)
-                  .loadUserTickets();
+                  .refreshUserTicketsWithResolvedNames();
             },
           ),
         ],
@@ -86,7 +86,7 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen>
 
           // Tab content
           Expanded(
-            child: ticketState.isLoading
+            child: (ticketState.isLoading || ticketState.isLoadingEnhanced)
                 ? const Center(child: CircularProgressIndicator())
                 : ticketState.error != null
                     ? Center(
@@ -122,7 +122,7 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen>
                                 ref
                                     .read(presentation_provider
                                         .ticketProvider.notifier)
-                                    .loadUserTickets();
+                                    .refreshUserTicketsWithResolvedNames();
                               },
                               child: const Text('Retry'),
                             ),
@@ -133,26 +133,26 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen>
                         controller: _tabController,
                         children: [
                           // Active tickets
-                          _buildTicketList(
-                            ticketState.tickets
-                                .where((t) => t.isActive)
+                          _buildEnhancedTicketList(
+                            ticketState.enhancedTickets
+                                .where((t) => t.ticket.isActive)
                                 .toList(),
                             'No active tickets',
                             'Book a ticket to see it here',
                           ),
 
                           // Expired tickets
-                          _buildTicketList(
-                            ticketState.tickets
-                                .where((t) => t.isExpired)
+                          _buildEnhancedTicketList(
+                            ticketState.enhancedTickets
+                                .where((t) => t.ticket.isExpired)
                                 .toList(),
                             'No expired tickets',
                             'Expired tickets will appear here',
                           ),
 
                           // All tickets
-                          _buildTicketList(
-                            ticketState.tickets,
+                          _buildEnhancedTicketList(
+                            ticketState.enhancedTickets,
                             'No tickets found',
                             'Your booking history will appear here',
                           ),
@@ -173,9 +173,11 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen>
     );
   }
 
-  Widget _buildTicketList(
-      List tickets, String emptyTitle, String emptySubtitle) {
-    if (tickets.isEmpty) {
+
+
+  Widget _buildEnhancedTicketList(
+      List enhancedTickets, String emptyTitle, String emptySubtitle) {
+    if (enhancedTickets.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -212,33 +214,41 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen>
       onRefresh: () async {
         await ref
             .read(presentation_provider.ticketProvider.notifier)
-            .loadUserTickets();
+            .refreshUserTicketsWithResolvedNames();
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: tickets.length,
+        itemCount: enhancedTickets.length,
         itemBuilder: (context, index) {
-          final ticket = tickets[index];
-          return TicketListItemWidget(
-            ticket: ticket,
+          final enhancedTicket = enhancedTickets[index];
+          final ticket = enhancedTicket.ticket;
+          
+          return EnhancedTicketListItemWidget(
+            enhancedTicket: enhancedTicket,
             onTap: () {
               // Check if this is an enhanced ticket with QR data
-              final enhancedTicket = ref
+              final currentEnhancedTicket = ref
                   .read(presentation_provider.ticketProvider)
                   .currentEnhancedTicket;
 
-              if (enhancedTicket != null && enhancedTicket.id == ticket.id) {
+              if (currentEnhancedTicket != null && currentEnhancedTicket.id == ticket.id) {
                 // Navigate to QR ticket screen for enhanced tickets
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => QrTicketScreen(ticket: enhancedTicket),
+                    builder: (_) => QrTicketScreen(
+                      ticket: currentEnhancedTicket,
+                      enhancedDisplay: enhancedTicket,
+                    ),
                   ),
                 );
               } else {
-                // Navigate to regular ticket detail screen
+                // Navigate to regular ticket detail screen with enhanced data
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => TicketDetailScreen(ticket: ticket),
+                    builder: (_) => TicketDetailScreen(
+                      ticket: ticket,
+                      enhancedTicket: enhancedTicket,
+                    ),
                   ),
                 );
               }

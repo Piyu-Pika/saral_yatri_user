@@ -7,6 +7,8 @@ import '../../widgets/common/custom_button.dart';
 import '../auth/login_screen.dart';
 import 'edit_profile_screen.dart';
 import 'notification_settings_screen.dart';
+import 'help_support_screen.dart';
+import 'about_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -143,7 +145,11 @@ class ProfileScreen extends ConsumerWidget {
                     title: 'Help & Support',
                     subtitle: 'Get help and contact support',
                     onTap: () {
-                      // TODO: Implement help & support
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const HelpSupportScreen(),
+                        ),
+                      );
                     },
                   ),
 
@@ -153,7 +159,21 @@ class ProfileScreen extends ConsumerWidget {
                     title: 'About',
                     subtitle: 'App version and information',
                     onTap: () {
-                      // TODO: Implement about page
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const AboutScreen(),
+                        ),
+                      );
+                    },
+                  ),
+
+                  _buildProfileOption(
+                    context,
+                    icon: Icons.bug_report,
+                    title: 'API Diagnostics',
+                    subtitle: 'Debug API issues and connectivity',
+                    onTap: () {
+                      Navigator.of(context).pushNamed('/api-diagnostics');
                     },
                   ),
 

@@ -34,21 +34,23 @@ class _TicketBookingFormScreenState extends ConsumerState<TicketBookingFormScree
 
   void _proceedToPayment() {
     final bookingData = {
-      'bus_id': widget.bus.id,
-      'boarding_station_id': widget.boardingStation.id,
-      'destination_station_id': widget.destinationStation.id,
-      'ticket_type': _selectedTicketType,
-      'payment_mode': _selectedPaymentMethod.apiValue,
-      'travel_date': _selectedTravelDate.toIso8601String(),
-      'calculated_fare': widget.calculatedFare,
+      'bus': widget.bus,
+      'boardingStation': widget.boardingStation,
+      'dropStation': widget.destinationStation,
+      'ticketType': _selectedTicketType,
+      'paymentMethod': _selectedPaymentMethod.apiValue,
+      'travelDate': _selectedTravelDate,
+      'fareData': {
+        'final_amount': widget.calculatedFare,
+        'base_fare': widget.calculatedFare,
+        'subsidy_amount': 0.0,
+      },
     };
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => PaymentScreen(
-          // bookingData: bookingData,
-          // totalAmount: widget.calculatedFare,
-        ),
+        builder: (_) => const PaymentScreen(),
+        settings: RouteSettings(arguments: bookingData),
       ),
     );
   }

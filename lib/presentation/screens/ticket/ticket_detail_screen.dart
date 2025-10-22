@@ -4,7 +4,9 @@ import 'package:screen_protector/screen_protector.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/ticket_model.dart';
 import '../../../data/models/enhanced_ticket_model.dart';
+import '../../../data/models/enhanced_ticket_display_model.dart';
 import '../../../core/services/mock_ticket_service.dart';
+import '../../../core/services/data_resolution_service.dart';
 import '../../widgets/common/custom_app_bar.dart';
 import '../../widgets/ticket/ticket_card.dart';
 import '../../widgets/ticket/qr_display.dart';
@@ -12,10 +14,12 @@ import 'qr_ticket_screen.dart';
 
 class TicketDetailScreen extends ConsumerStatefulWidget {
   final TicketModel ticket;
+  final EnhancedTicketDisplayModel? enhancedTicket;
 
   const TicketDetailScreen({
     super.key,
     required this.ticket,
+    this.enhancedTicket,
   });
 
   @override
@@ -23,11 +27,21 @@ class TicketDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
+  EnhancedTicketDisplayModel? _resolvedTicket;
+  bool _isLoadingNames = false;
+
   @override
   void initState() {
     super.initState();
     if (widget.ticket.isActive) {
       _enableScreenProtection();
+    }
+    
+    // If we don't have enhanced ticket data, try to resolve names
+    if (widget.enhancedTicket == null) {
+      _resolveTicketNames();
+    } else {
+      _resolvedTicket = widget.enhancedTicket;
     }
   }
 
@@ -62,9 +76,50 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => QrTicketScreen(ticket: enhancedTicket),
+        builder: (context) => QrTicketScreen(
+          ticket: enhancedTicket,
+          enhancedDisplay: _resolvedTicket,
+        ),
       ),
     );
+  }
+
+  Future<void> _resolveTicketNames() async {
+    if (widget.ticket.boardingStationId == null || 
+        widget.ticket.destinationStationId == null) {
+      // Create enhanced ticket from existing data if no station IDs
+      _resolvedTicket = EnhancedTicketDisplayModel.fromTicket(widget.ticket);
+      return;
+    }
+
+    setState(() {
+      _isLoadingNames = true;
+    });
+
+    try {
+      final resolvedData = await DataResolutionService.resolveTicketData(
+        boardingStationId: widget.ticket.boardingStationId!,
+        destinationStationId: widget.ticket.destinationStationId!,
+        busId: widget.ticket.busId,
+        routeId: widget.ticket.routeId,
+      );
+
+      setState(() {
+        _resolvedTicket = EnhancedTicketDisplayModel.withResolvedNames(
+          ticket: widget.ticket,
+          boardingStationName: resolvedData['boardingStation']!,
+          destinationStationName: resolvedData['destinationStation']!,
+          busNumber: resolvedData['busNumber']!,
+          routeName: resolvedData['routeName']!,
+        );
+        _isLoadingNames = false;
+      });
+    } catch (e) {
+      setState(() {
+        _resolvedTicket = EnhancedTicketDisplayModel.fromTicket(widget.ticket);
+        _isLoadingNames = false;
+      });
+    }
   }
 
   EnhancedTicketModel _convertToEnhancedTicket(TicketModel ticket) {
@@ -72,11 +127,11 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
     return MockTicketService.createMockEnhancedTicket(
       busId: ticket.busId,
       routeId: ticket.routeId,
-      boardingStationId: ticket.boardingStop,
-      destinationStationId: ticket.droppingStop,
+      boardingStationId: ticket.boardingStationId ?? ticket.boardingStop,
+      destinationStationId: ticket.destinationStationId ?? ticket.droppingStop,
       paymentMethod: ticket.paymentMethod,
-      ticketType: 'single',
-      travelDate: ticket.bookingTime,
+      ticketType: ticket.ticketType ?? 'single',
+      travelDate: ticket.travelDate ?? ticket.bookingTime,
     );
   }
 
@@ -142,8 +197,11 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  // Ticket card
-                  TicketCardWidget(ticket: widget.ticket),
+                  // Ticket card with enhanced data
+                  TicketCardWidget(
+                    ticket: widget.ticket,
+                    enhancedTicket: _resolvedTicket,
+                  ),
 
                   const SizedBox(height: 16),
 
@@ -175,30 +233,56 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
   }
 
   Widget _buildJourneyDetails() {
+    final displayTicket = _resolvedTicket ?? EnhancedTicketDisplayModel.fromTicket(widget.ticket);
+    
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Journey Details',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
+            Row(
+              children: [
+                const Text(
+                  'Journey Details',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                if (_isLoadingNames) ...[
+                  const SizedBox(width: 8),
+                  const SizedBox(
+                    width: 12,
+                    height: 12,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ] else if (displayTicket.isDataResolved) ...[
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.check_circle,
+                    size: 16,
+                    color: AppColors.success.withValues(alpha: 0.7),
+                  ),
+                ],
+              ],
             ),
             const SizedBox(height: 12),
-            _buildDetailRow('Bus Number', widget.ticket.busNumber),
-            _buildDetailRow('Route', widget.ticket.routeName),
-            _buildDetailRow('From', widget.ticket.boardingStop),
-            _buildDetailRow('To', widget.ticket.droppingStop),
+            _buildDetailRow('Bus Number', displayTicket.busNumber),
+            if (displayTicket.isDataResolved && 
+                displayTicket.routeName.isNotEmpty && 
+                !displayTicket.routeName.startsWith('Route'))
+              _buildDetailRow('Route', displayTicket.routeName),
+            _buildDetailRow('From', displayTicket.boardingStationName),
+            _buildDetailRow('To', displayTicket.destinationStationName),
             _buildDetailRow('Travel Date', 
               '${widget.ticket.bookingTime.day}/${widget.ticket.bookingTime.month}/${widget.ticket.bookingTime.year}'),
             _buildDetailRow('Valid Until', 
               '${widget.ticket.expiryTime.day}/${widget.ticket.expiryTime.month}/${widget.ticket.expiryTime.year} '
               '${widget.ticket.expiryTime.hour}:${widget.ticket.expiryTime.minute.toString().padLeft(2, '0')}'),
+            if (widget.ticket.ticketNumber != null)
+              _buildDetailRow('Ticket Number', widget.ticket.ticketNumber!),
           ],
         ),
       ),
@@ -222,7 +306,11 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
             ),
             const SizedBox(height: 12),
             _buildDetailRow('Original Fare', '₹${widget.ticket.originalFare.toStringAsFixed(2)}'),
-            _buildDetailRow('Subsidy Amount', '-₹${widget.ticket.subsidyAmount.toStringAsFixed(2)}'),
+            if (widget.ticket.subsidyAmount > 0)
+              _buildDetailRow('Subsidy Amount', '-₹${widget.ticket.subsidyAmount.toStringAsFixed(2)}',
+                color: AppColors.success),
+            if (widget.ticket.taxAmount != null && widget.ticket.taxAmount! > 0)
+              _buildDetailRow('Tax Amount', '₹${widget.ticket.taxAmount!.toStringAsFixed(2)}'),
             const Divider(),
             _buildDetailRow('Final Amount', '₹${widget.ticket.finalFare.toStringAsFixed(2)}', 
               isTotal: true),
@@ -249,18 +337,23 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
             ),
             const SizedBox(height: 12),
             _buildDetailRow('Ticket ID', widget.ticket.id),
+            if (widget.ticket.ticketNumber != null)
+              _buildDetailRow('Ticket Number', widget.ticket.ticketNumber!),
             _buildDetailRow('Booking Time', 
               '${widget.ticket.bookingTime.day}/${widget.ticket.bookingTime.month}/${widget.ticket.bookingTime.year} '
               '${widget.ticket.bookingTime.hour}:${widget.ticket.bookingTime.minute.toString().padLeft(2, '0')}'),
             _buildDetailRow('Payment Method', widget.ticket.paymentMethod.toUpperCase()),
-            _buildDetailRow('Status', widget.ticket.status.toUpperCase()),
+            if (widget.ticket.transactionId != null)
+              _buildDetailRow('Transaction ID', widget.ticket.transactionId!),
+            _buildDetailRow('Status', widget.ticket.status.toUpperCase(),
+              color: widget.ticket.isActive ? AppColors.success : AppColors.error),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value, {bool isTotal = false}) {
+  Widget _buildDetailRow(String label, String value, {bool isTotal = false, Color? color}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -279,7 +372,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
             style: TextStyle(
               fontSize: isTotal ? 16 : 14,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
-              color: isTotal ? AppColors.primary : AppColors.textPrimary,
+              color: color ?? (isTotal ? AppColors.primary : AppColors.textPrimary),
             ),
           ),
         ],

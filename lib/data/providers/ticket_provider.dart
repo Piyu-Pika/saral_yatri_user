@@ -61,7 +61,7 @@ class TicketNotifier extends StateNotifier<TicketState> {
     }
   }
 
-  Future<void> bookTicket(Map<String, dynamic> bookingData) async {
+  Future<void> _bookTicketWithData(Map<String, dynamic> bookingData) async {
     state = state.copyWith(isLoading: true);
 
     try {
@@ -85,6 +85,57 @@ class TicketNotifier extends StateNotifier<TicketState> {
     }
   }
 
+  /// Book ticket with named parameters (used by payment screen)
+  Future<bool> bookTicket({
+    required String busId,
+    required String routeId,
+    required String boardingStationId,
+    required String droppingStationId,
+    required String paymentMethod,
+    required String ticketType,
+    required DateTime travelDate,
+  }) async {
+    try {
+      final bookingData = {
+        'bus_id': busId,
+        'route_id': routeId,
+        'boarding_station_id': boardingStationId,
+        'destination_station_id': droppingStationId,
+        'ticket_type': ticketType,
+        'travel_date': travelDate.toIso8601String(),
+        'payment_mode': paymentMethod,
+        'payment_method': 'app_booking',
+      };
+
+      await _bookTicketWithData(bookingData);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Book enhanced ticket with QR data (placeholder for now)
+  Future<bool> bookEnhancedTicket({
+    required String busId,
+    required String routeId,
+    required String boardingStationId,
+    required String droppingStationId,
+    required String paymentMethod,
+    required String ticketType,
+    required DateTime travelDate,
+  }) async {
+    // For now, just call regular booking
+    return await bookTicket(
+      busId: busId,
+      routeId: routeId,
+      boardingStationId: boardingStationId,
+      droppingStationId: droppingStationId,
+      paymentMethod: paymentMethod,
+      ticketType: ticketType,
+      travelDate: travelDate,
+    );
+  }
+
   Future<void> loadTicketDetails(String ticketId) async {
     try {
       final response = await _apiService.get('${ApiConstants.ticketDetails}/$ticketId');
@@ -99,6 +150,76 @@ class TicketNotifier extends StateNotifier<TicketState> {
       state = state.copyWith(tickets: updatedTickets);
     } catch (e) {
       state = state.copyWith(error: e.toString());
+    }
+  }
+
+  /// Load only active tickets using the new endpoint
+  Future<void> loadMyActiveTickets() async {
+    state = state.copyWith(isLoading: true);
+
+    try {
+      final response = await _apiService.get(ApiConstants.myActiveTickets);
+      final ticketsData = response.data['data'] as List;
+      final tickets = ticketsData.map((data) => TicketModel.fromJson(data)).toList();
+
+      state = state.copyWith(
+        tickets: tickets,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString(),
+      );
+    }
+  }
+
+  /// Check ticket status using the new endpoint
+  Future<Map<String, dynamic>?> checkTicketStatus(String ticketId) async {
+    try {
+      final response = await _apiService.get('${ApiConstants.ticketStatus}/$ticketId/status');
+      return response.data['data'];
+    } catch (e) {
+      state = state.copyWith(error: e.toString());
+      return null;
+    }
+  }
+
+  /// Check if ticket is active using the new endpoint
+  Future<bool> isTicketActive(String ticketId) async {
+    try {
+      final response = await _apiService.get('${ApiConstants.ticketIsActive}/$ticketId/is-active');
+      return response.data['data']['is_active'] ?? false;
+    } catch (e) {
+      state = state.copyWith(error: e.toString());
+      return false;
+    }
+  }
+
+  /// Calculate fare using the working endpoint
+  Future<Map<String, dynamic>?> calculateFare({
+    required String busId,
+    required String routeId,
+    required String boardingStationId,
+    required String destinationStationId,
+    required String ticketType,
+    required DateTime travelDate,
+  }) async {
+    try {
+      final fareData = {
+        'bus_id': busId,
+        'route_id': routeId,
+        'boarding_station_id': boardingStationId,
+        'destination_station_id': destinationStationId,
+        'ticket_type': ticketType,
+        'travel_date': travelDate.toIso8601String(),
+      };
+
+      final response = await _apiService.post(ApiConstants.calculateFare, data: fareData);
+      return response.data['data'];
+    } catch (e) {
+      state = state.copyWith(error: e.toString());
+      return null;
     }
   }
 }
