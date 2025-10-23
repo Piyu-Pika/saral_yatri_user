@@ -50,7 +50,8 @@ class StationMarkerWidget extends StatelessWidget {
             Text('Code: ${station.code}'),
             Text('Route ID: ${station.routeId}'),
             Text('Sequence: ${station.sequence}'),
-            Text('Location: ${station.location.latitude.toStringAsFixed(4)}, ${station.location.longitude.toStringAsFixed(4)}'),
+            Text(
+                'Location: ${station.location.latitude.toStringAsFixed(4)}, ${station.location.longitude.toStringAsFixed(4)}'),
             const SizedBox(height: 8),
             Row(
               children: [

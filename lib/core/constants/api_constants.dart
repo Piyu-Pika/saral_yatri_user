@@ -38,6 +38,11 @@ class ApiConstants {
   static const String ticketIsActive = '/tickets/passenger'; // /tickets/passenger/{id}/is-active
   static const String calculateFare = '/tickets/calculate-fare';
 
+  // Subsidy Application Endpoints
+  static const String submitSubsidyApplication = '/user/subsidy-applications';
+  static const String mySubsidyApplications = '/user/subsidy-applications';
+  static const String subsidyApplicationDetails = '/user/subsidy-applications'; // /user/subsidy-applications/{id}
+
   // Headers
   static const String authHeader = 'Authorization';
   static const String contentType = 'Content-Type';

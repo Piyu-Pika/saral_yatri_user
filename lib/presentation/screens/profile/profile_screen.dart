@@ -9,6 +9,7 @@ import 'edit_profile_screen.dart';
 import 'notification_settings_screen.dart';
 import 'help_support_screen.dart';
 import 'about_screen.dart';
+import 'subsidy_application_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -136,6 +137,20 @@ class ProfileScreen extends ConsumerWidget {
                     subtitle: 'Change password and security settings',
                     onTap: () {
                       // TODO: Implement security settings
+                    },
+                  ),
+
+                  _buildProfileOption(
+                    context,
+                    icon: Icons.card_membership,
+                    title: 'Subsidy Applications',
+                    subtitle: 'Apply for and manage your subsidies',
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const SubsidyApplicationScreen(),
+                        ),
+                      );
                     },
                   ),
 
