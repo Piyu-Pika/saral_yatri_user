@@ -102,8 +102,8 @@ lib/
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd saral_yatri
+   git clone https://github.com/Piyu-Pika/saral_yatri_user
+   cd saral_yatri_user
    ```
 
 2. **Install dependencies**
