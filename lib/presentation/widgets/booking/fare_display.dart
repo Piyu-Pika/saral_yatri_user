@@ -49,10 +49,10 @@ class FareDisplay extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             if (showBreakdown) ...[
               const SizedBox(height: 16),
-              
+
               // Distance (if available)
               if (distance != null)
                 _FareRow(
@@ -60,38 +60,38 @@ class FareDisplay extends StatelessWidget {
                   value: '${distance!.toStringAsFixed(1)} km',
                   isInfo: true,
                 ),
-              
+
               // Original fare
               _FareRow(
                 label: 'Base Fare',
                 value: '₹${originalFare.toStringAsFixed(2)}',
               ),
-              
+
               // Subsidy (if applicable)
               if (subsidyAmount > 0)
                 _FareRow(
-                  label: subsidyType != null 
-                      ? '$subsidyType Subsidy' 
-                      : 'Subsidy',
+                  label:
+                      subsidyType != null ? '$subsidyType Subsidy' : 'Subsidy',
                   value: '-₹${subsidyAmount.toStringAsFixed(2)}',
                   isDiscount: true,
                 ),
-              
+
               const Divider(height: 24),
             ],
-            
+
             // Final amount
             _FareRow(
               label: 'Total Amount',
               value: '₹${finalFare.toStringAsFixed(2)}',
               isTotal: true,
             ),
-            
+
             // Savings indicator
             if (subsidyAmount > 0) ...[
               const SizedBox(height: 12),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: AppColors.success.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -192,7 +192,7 @@ class CompactFareDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasDiscount = subsidyAmount != null && subsidyAmount! > 0;
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(

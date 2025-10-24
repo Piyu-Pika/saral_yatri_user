@@ -18,14 +18,14 @@ class ConductorRegisterRequest {
   });
 
   Map<String, dynamic> toJson() => {
-    'username': username,
-    'email': email,
-    'phone': phone,
-    'employee_id': employeeId,
-    if (licenseNumber != null) 'license_number': licenseNumber,
-    'badge_number': badgeNumber,
-    'depot': depot,
-  };
+        'username': username,
+        'email': email,
+        'phone': phone,
+        'employee_id': employeeId,
+        if (licenseNumber != null) 'license_number': licenseNumber,
+        'badge_number': badgeNumber,
+        'depot': depot,
+      };
 }
 
 class ConductorLoginRequest {
@@ -38,7 +38,7 @@ class ConductorLoginRequest {
   });
 
   Map<String, dynamic> toJson() => {
-    'username': username,
-    'password': password,
-  };
+        'username': username,
+        'password': password,
+      };
 }

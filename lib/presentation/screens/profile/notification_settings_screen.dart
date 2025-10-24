@@ -8,10 +8,12 @@ class NotificationSettingsScreen extends ConsumerStatefulWidget {
   const NotificationSettingsScreen({super.key});
 
   @override
-  ConsumerState<NotificationSettingsScreen> createState() => _NotificationSettingsScreenState();
+  ConsumerState<NotificationSettingsScreen> createState() =>
+      _NotificationSettingsScreenState();
 }
 
-class _NotificationSettingsScreenState extends ConsumerState<NotificationSettingsScreen> {
+class _NotificationSettingsScreenState
+    extends ConsumerState<NotificationSettingsScreen> {
   bool _ticketBookingNotifications = true;
   bool _ticketExpiryNotifications = true;
   bool _promotionalNotifications = false;
@@ -119,7 +121,8 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                 ),
               ),
               title: const Text('Test Notification'),
-              subtitle: const Text('Send a test notification to check if it works'),
+              subtitle:
+                  const Text('Send a test notification to check if it works'),
               trailing: ElevatedButton(
                 onPressed: () async {
                   // await NotificationService.showNotification(

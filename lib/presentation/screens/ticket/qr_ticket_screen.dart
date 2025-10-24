@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:qr/qr.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/utils/qr_utils.dart';
-import '../../../data/models/enhanced_ticket_model.dart';
+import '../../../data/models/ticket_model.dart';
 import '../../../data/models/enhanced_ticket_display_model.dart';
 import '../../../core/services/data_resolution_service.dart';
 
 class QrTicketScreen extends StatefulWidget {
-  final EnhancedTicketModel ticket;
+  final TicketModel ticket;
   final EnhancedTicketDisplayModel? enhancedDisplay;
 
   const QrTicketScreen({
@@ -79,21 +79,30 @@ class _QrTicketScreenState extends State<QrTicketScreen>
   }
 
   Future<void> _resolveStationNames() async {
+    if (widget.ticket.boardingStationId == null ||
+        widget.ticket.destinationStationId == null) {
+      setState(() {
+        _resolvedDisplay = EnhancedTicketDisplayModel.fromTicket(widget.ticket);
+        _isLoadingNames = false;
+      });
+      return;
+    }
+
     setState(() {
       _isLoadingNames = true;
     });
 
     try {
       final resolvedData = await DataResolutionService.resolveTicketData(
-        boardingStationId: widget.ticket.boardingStationId,
-        destinationStationId: widget.ticket.destinationStationId,
+        boardingStationId: widget.ticket.boardingStationId!,
+        destinationStationId: widget.ticket.destinationStationId!,
         busId: widget.ticket.busId,
         routeId: widget.ticket.routeId,
       );
 
       setState(() {
         _resolvedDisplay = EnhancedTicketDisplayModel.withResolvedNames(
-          ticket: widget.ticket.toTicketModel(),
+          ticket: widget.ticket,
           boardingStationName: resolvedData['boardingStation']!,
           destinationStationName: resolvedData['destinationStation']!,
           busNumber: resolvedData['busNumber']!,
@@ -103,8 +112,7 @@ class _QrTicketScreenState extends State<QrTicketScreen>
       });
     } catch (e) {
       setState(() {
-        _resolvedDisplay = EnhancedTicketDisplayModel.fromTicket(
-            widget.ticket.toTicketModel());
+        _resolvedDisplay = EnhancedTicketDisplayModel.fromTicket(widget.ticket);
         _isLoadingNames = false;
       });
     }
@@ -113,7 +121,7 @@ class _QrTicketScreenState extends State<QrTicketScreen>
   Color _getStatusColor() {
     if (widget.ticket.isExpired) {
       return AppTheme.errorColor;
-    } else if (widget.ticket.isUsed) {
+    } else if (widget.ticket.status == 'used') {
       return Colors.orange;
     } else if (widget.ticket.isActive) {
       return AppTheme.successColor;
@@ -124,7 +132,7 @@ class _QrTicketScreenState extends State<QrTicketScreen>
   String _getStatusText() {
     if (widget.ticket.isExpired) {
       return 'EXPIRED';
-    } else if (widget.ticket.isUsed) {
+    } else if (widget.ticket.status == 'used') {
       return 'USED';
     } else if (widget.ticket.isActive) {
       return 'ACTIVE';
@@ -133,7 +141,8 @@ class _QrTicketScreenState extends State<QrTicketScreen>
   }
 
   void _copyTicketNumber() {
-    Clipboard.setData(ClipboardData(text: widget.ticket.ticketNumber));
+    final ticketNumber = widget.ticket.ticketNumber ?? widget.ticket.id;
+    Clipboard.setData(ClipboardData(text: ticketNumber));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Ticket number copied to clipboard'),
@@ -241,7 +250,8 @@ class _QrTicketScreenState extends State<QrTicketScreen>
                                           MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          widget.ticket.ticketNumber,
+                                          widget.ticket.ticketNumber ??
+                                              widget.ticket.id,
                                           style: const TextStyle(
                                             color: Colors.white,
                                             fontSize: 18,
@@ -297,7 +307,7 @@ class _QrTicketScreenState extends State<QrTicketScreen>
 
                                 const SizedBox(height: 16),
 
-                                // QR Code
+                                // QR Code using actual API data
                                 Container(
                                   padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
@@ -308,15 +318,12 @@ class _QrTicketScreenState extends State<QrTicketScreen>
                                       width: 2,
                                     ),
                                   ),
-                                  child: QrUtils.generateQrWidget(
-                                    widget.ticket.qrData,
-                                    size: 200,
-                                  ),
+                                  child: _buildQRCodeFromTicket(),
                                 ),
 
                                 const SizedBox(height: 16),
 
-                                // Validation Code
+                                // Validation Code from ticket
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 16,
@@ -328,7 +335,7 @@ class _QrTicketScreenState extends State<QrTicketScreen>
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    'Validation: ${widget.ticket.qrData.validationCode}',
+                                    'Ticket ID: ${widget.ticket.id}',
                                     style: const TextStyle(
                                       color: AppTheme.primaryColor,
                                       fontWeight: FontWeight.bold,
@@ -369,12 +376,16 @@ class _QrTicketScreenState extends State<QrTicketScreen>
 
                             _buildDetailRow('Bus Number', _getBusDisplay()),
                             _buildDetailRow('Route', _getRouteDisplay()),
-                            _buildDetailRow('Ticket Type',
-                                widget.ticket.ticketType.toUpperCase()),
-                            _buildDetailRow('Travel Date',
-                                _formatDate(widget.ticket.travelDate)),
+                            _buildDetailRow(
+                                'Ticket Type',
+                                (widget.ticket.ticketType ?? 'single')
+                                    .toUpperCase()),
+                            _buildDetailRow(
+                                'Travel Date',
+                                _formatDate(widget.ticket.travelDate ??
+                                    widget.ticket.bookingTime)),
                             _buildDetailRow('Valid Until',
-                                _formatDateTime(widget.ticket.validUntil)),
+                                _formatDateTime(widget.ticket.expiryTime)),
                             _buildDetailRow('Booking Time',
                                 _formatDateTime(widget.ticket.bookingTime)),
 
@@ -393,21 +404,21 @@ class _QrTicketScreenState extends State<QrTicketScreen>
                             const SizedBox(height: 12),
 
                             _buildDetailRow('Base Fare',
-                                '₹${widget.ticket.fareDetails.baseFare.toStringAsFixed(2)}'),
-                            if (widget.ticket.fareDetails.totalSubsidyAmount >
-                                0)
+                                '₹${widget.ticket.originalFare.toStringAsFixed(2)}'),
+                            if (widget.ticket.subsidyAmount > 0)
                               _buildDetailRow('Subsidy',
-                                  '-₹${widget.ticket.fareDetails.totalSubsidyAmount.toStringAsFixed(2)}',
+                                  '-₹${widget.ticket.subsidyAmount.toStringAsFixed(2)}',
                                   color: AppTheme.successColor),
-                            if (widget.ticket.fareDetails.totalTaxAmount > 0)
+                            if (widget.ticket.taxAmount != null &&
+                                widget.ticket.taxAmount! > 0)
                               _buildDetailRow('Tax',
-                                  '₹${widget.ticket.fareDetails.totalTaxAmount.toStringAsFixed(2)}'),
+                                  '₹${widget.ticket.taxAmount!.toStringAsFixed(2)}'),
 
                             const Divider(height: 16),
 
                             _buildDetailRow(
                               'Final Amount',
-                              '₹${widget.ticket.fareDetails.finalAmount.toStringAsFixed(2)}',
+                              '₹${widget.ticket.finalFare.toStringAsFixed(2)}',
                               isTotal: true,
                             ),
 
@@ -425,25 +436,19 @@ class _QrTicketScreenState extends State<QrTicketScreen>
 
                             const SizedBox(height: 12),
 
-                            _buildDetailRow(
-                                'Payment Mode',
-                                widget.ticket.paymentDetails.paymentMode
-                                    .toUpperCase()),
-                            _buildDetailRow('Transaction ID',
-                                widget.ticket.paymentDetails.transactionId),
-                            _buildDetailRow(
-                                'Payment Status',
-                                widget.ticket.paymentDetails.paymentStatus
-                                    .toUpperCase(),
-                                color: widget.ticket.paymentDetails
-                                            .paymentStatus ==
-                                        'completed'
-                                    ? AppTheme.successColor
-                                    : AppTheme.errorColor),
-                            _buildDetailRow(
-                                'Payment Time',
-                                _formatDateTime(
-                                    widget.ticket.paymentDetails.paymentTime)),
+                            _buildDetailRow('Payment Mode',
+                                widget.ticket.paymentMethod.toUpperCase()),
+                            if (widget.ticket.transactionId != null)
+                              _buildDetailRow('Transaction ID',
+                                  widget.ticket.transactionId!),
+                            _buildDetailRow('Payment Status',
+                                widget.ticket.paymentStatus.toUpperCase(),
+                                color:
+                                    widget.ticket.paymentStatus == 'completed'
+                                        ? AppTheme.successColor
+                                        : AppTheme.errorColor),
+                            _buildDetailRow('Payment Time',
+                                _formatDateTime(widget.ticket.bookingTime)),
                           ],
                         ),
                       ),
@@ -572,13 +577,18 @@ class _QrTicketScreenState extends State<QrTicketScreen>
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
             ),
           ),
-          Text(
-            value,
-            style: TextStyle(
-              color: color ??
-                  (isTotal ? AppTheme.primaryColor : AppTheme.textPrimary),
-              fontSize: isTotal ? 16 : 14,
-              fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
+          Flexible(
+            child: Text(
+              value,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              softWrap: false,
+              style: TextStyle(
+                color: color ??
+                    (isTotal ? AppTheme.primaryColor : AppTheme.textPrimary),
+                fontSize: isTotal ? 16 : 14,
+                fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
+              ),
             ),
           ),
         ],
@@ -622,7 +632,7 @@ class _QrTicketScreenState extends State<QrTicketScreen>
               const SizedBox(height: 4),
               Text(
                 displayTicket?.boardingStationName ??
-                    'Station ${widget.ticket.boardingStationId}',
+                    widget.ticket.boardingStop,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -659,7 +669,7 @@ class _QrTicketScreenState extends State<QrTicketScreen>
               const SizedBox(height: 4),
               Text(
                 displayTicket?.destinationStationName ??
-                    'Station ${widget.ticket.destinationStationId}',
+                    widget.ticket.droppingStop,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -679,7 +689,9 @@ class _QrTicketScreenState extends State<QrTicketScreen>
     if (displayTicket?.isDataResolved == true) {
       return displayTicket!.busNumber;
     }
-    return widget.ticket.busId;
+    return widget.ticket.busNumber.isNotEmpty
+        ? widget.ticket.busNumber
+        : widget.ticket.busId;
   }
 
   String _getRouteDisplay() {
@@ -689,6 +701,94 @@ class _QrTicketScreenState extends State<QrTicketScreen>
         !displayTicket.routeName.startsWith('Route')) {
       return displayTicket.routeName;
     }
-    return widget.ticket.routeId;
+    return widget.ticket.routeName.isNotEmpty
+        ? widget.ticket.routeName
+        : widget.ticket.routeId;
   }
+
+  Widget _buildQRCodeFromTicket() {
+    // Prioritize encrypted_token over qr_code
+    String? qrData = widget.ticket.encryptedToken;
+    if (qrData == null || qrData.isEmpty) {
+      qrData = widget.ticket.qrCode;
+    }
+
+    if (qrData.isEmpty) {
+      return Container(
+        width: 200,
+        height: 200,
+        child: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 48, color: Colors.red),
+              SizedBox(height: 8),
+              Text('No QR Code', style: TextStyle(color: Colors.red)),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      width: 200,
+      height: 200,
+      child: CustomPaint(
+        size: const Size(200, 200),
+        painter: _QRCodePainter(data: qrData),
+      ),
+    );
+  }
+}
+
+class _QRCodePainter extends CustomPainter {
+  final String data;
+
+  _QRCodePainter({required this.data});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    try {
+      final qrCode = QrCode.fromData(
+        data: data,
+        errorCorrectLevel: QrErrorCorrectLevel.M,
+      );
+
+      final qrImage = QrImage(qrCode);
+      final pixelSize = size.width / qrImage.moduleCount;
+
+      final paint = Paint()
+        ..color = Colors.black
+        ..style = PaintingStyle.fill;
+
+      for (int x = 0; x < qrImage.moduleCount; x++) {
+        for (int y = 0; y < qrImage.moduleCount; y++) {
+          if (qrImage.isDark(y, x)) {
+            final rect = Rect.fromLTWH(
+              x * pixelSize,
+              y * pixelSize,
+              pixelSize,
+              pixelSize,
+            );
+            canvas.drawRect(rect, paint);
+          }
+        }
+      }
+    } catch (e) {
+      // Fallback: draw error message
+      final paint = Paint()
+        ..color = Colors.red
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2;
+
+      canvas.drawRect(Offset.zero & size, paint);
+
+      // Draw X mark
+      canvas.drawLine(Offset.zero, Offset(size.width, size.height), paint);
+      canvas.drawLine(Offset(size.width, 0), Offset(0, size.height), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

@@ -18,7 +18,7 @@ class TicketModel {
   final String status; // active, expired, used
   final bool isVerified;
   final DateTime? verificationTime;
-  
+
   // Additional fields from API
   final String? ticketNumber;
   final String? ticketType;
@@ -65,44 +65,73 @@ class TicketModel {
     final qrData = json['qr_data'] ?? {};
     final fareDetails = ticketData['fare_details'] ?? {};
     final paymentDetails = ticketData['payment_details'] ?? {};
-    
+
     // Extract basic ticket information
-    final ticketId = ticketData['id'] ?? ticketData['ticket_id'] ?? qrData['ticket_id'] ?? '';
-    final passengerId = ticketData['passenger_id'] ?? qrData['passenger_id'] ?? '';
+    final ticketId = ticketData['id'] ??
+        ticketData['ticket_id'] ??
+        qrData['ticket_id'] ??
+        '';
+    final passengerId =
+        ticketData['passenger_id'] ?? qrData['passenger_id'] ?? '';
     final busId = ticketData['bus_id'] ?? qrData['bus_id'] ?? '';
     final routeId = ticketData['route_id'] ?? qrData['route_id'] ?? '';
-    final boardingStationId = ticketData['boarding_station_id'] ?? qrData['boarding_station_id'] ?? '';
-    final destinationStationId = ticketData['destination_station_id'] ?? qrData['destination_station_id'] ?? '';
-    
+    final boardingStationId = ticketData['boarding_station_id'] ??
+        qrData['boarding_station_id'] ??
+        '';
+    final destinationStationId = ticketData['destination_station_id'] ??
+        qrData['destination_station_id'] ??
+        '';
+
     // Extract fare information from fare_details or qr_data
-    final baseFare = (fareDetails['base_fare'] ?? fareDetails['gross_fare'] ?? qrData['fare_amount'] ?? 0.0).toDouble();
-    final subsidyAmount = (fareDetails['total_subsidy_amount'] ?? qrData['subsidy_amount'] ?? 0.0).toDouble();
-    final finalAmount = (fareDetails['final_amount'] ?? qrData['fare_amount'] ?? baseFare).toDouble();
-    
+    final baseFare = (fareDetails['base_fare'] ??
+            fareDetails['gross_fare'] ??
+            qrData['fare_amount'] ??
+            0.0)
+        .toDouble();
+    final subsidyAmount =
+        (fareDetails['total_subsidy_amount'] ?? qrData['subsidy_amount'] ?? 0.0)
+            .toDouble();
+    final finalAmount =
+        (fareDetails['final_amount'] ?? qrData['fare_amount'] ?? baseFare)
+            .toDouble();
+
     // Extract payment information
-    final paymentMode = paymentDetails['payment_mode'] ?? paymentDetails['payment_method'] ?? '';
+    final paymentMode = paymentDetails['payment_mode'] ??
+        paymentDetails['payment_method'] ??
+        '';
     final paymentStatus = paymentDetails['payment_status'] ?? 'completed';
-    
+
     // Extract dates
-    final bookingTime = ticketData['booking_time'] ?? ticketData['created_at'] ?? DateTime.now().toIso8601String();
-    final validUntil = ticketData['valid_until'] ?? qrData['valid_until'] ?? DateTime.now().add(const Duration(hours: 24)).toIso8601String();
-    
-    // Extract QR code information
-    final qrToken = ticketData['qr_token'] ?? ticketData['encrypted_token'] ?? '';
-    
+    final bookingTime = ticketData['booking_time'] ??
+        ticketData['created_at'] ??
+        DateTime.now().toIso8601String();
+    final validUntil = ticketData['valid_until'] ??
+        qrData['valid_until'] ??
+        DateTime.now().add(const Duration(hours: 24)).toIso8601String();
+
+    // Extract QR code information - prioritize encrypted_token
+    final encryptedToken = ticketData['encrypted_token'] ?? '';
+    final qrToken = encryptedToken.isNotEmpty
+        ? encryptedToken
+        : (ticketData['qr_token'] ?? '');
+
     // Extract status and verification
     final status = ticketData['status'] ?? 'booked';
     final isVerified = ticketData['is_verified'] ?? false;
-    
+
     return TicketModel(
       id: ticketId,
       userId: passengerId,
       busId: busId,
-      busNumber: ticketData['bus_number'] ?? busId, // Use bus_id as fallback for display
+      busNumber: ticketData['bus_number'] ??
+          busId, // Use bus_id as fallback for display
       routeId: routeId,
-      routeName: ticketData['route_name'] ?? routeId, // Use route_id as fallback for display
-      boardingStop: ticketData['boarding_stop'] ?? boardingStationId, // Use station_id as fallback
-      droppingStop: ticketData['dropping_stop'] ?? destinationStationId, // Use station_id as fallback
+      routeName: ticketData['route_name'] ??
+          routeId, // Use route_id as fallback for display
+      boardingStop: ticketData['boarding_stop'] ??
+          boardingStationId, // Use station_id as fallback
+      droppingStop: ticketData['dropping_stop'] ??
+          destinationStationId, // Use station_id as fallback
       originalFare: baseFare,
       subsidyAmount: subsidyAmount,
       finalFare: finalAmount,
@@ -113,14 +142,14 @@ class TicketModel {
       qrCode: qrToken,
       status: _mapApiStatusToAppStatus(status),
       isVerified: isVerified,
-      verificationTime: ticketData['verification_time'] != null 
-          ? DateTime.parse(ticketData['verification_time']) 
+      verificationTime: ticketData['verification_time'] != null
+          ? DateTime.parse(ticketData['verification_time'])
           : null,
       // Additional fields
       ticketNumber: ticketData['ticket_number'] ?? qrData['ticket_number'],
       ticketType: ticketData['ticket_type'],
-      travelDate: ticketData['travel_date'] != null 
-          ? DateTime.parse(ticketData['travel_date']) 
+      travelDate: ticketData['travel_date'] != null
+          ? DateTime.parse(ticketData['travel_date'])
           : null,
       boardingStationId: boardingStationId,
       destinationStationId: destinationStationId,
@@ -129,7 +158,7 @@ class TicketModel {
       encryptedToken: ticketData['encrypted_token'],
     );
   }
-  
+
   /// Map API status values to app status values
   static String _mapApiStatusToAppStatus(String apiStatus) {
     switch (apiStatus.toLowerCase()) {
@@ -181,19 +210,20 @@ class TicketModel {
 
   bool get isExpired => DateTime.now().isAfter(expiryTime);
   bool get isActive => (status == 'active' || status == 'booked') && !isExpired;
-  
+
   /// Get a user-friendly display name for the ticket
   String get displayName => ticketNumber ?? 'Ticket $id';
-  
+
   /// Get formatted fare with currency
   String get formattedFare => '₹${finalFare.toStringAsFixed(2)}';
-  
+
   /// Get formatted original fare with currency
   String get formattedOriginalFare => '₹${originalFare.toStringAsFixed(2)}';
-  
+
   /// Get formatted subsidy amount with currency
-  String get formattedSubsidy => subsidyAmount > 0 ? '₹${subsidyAmount.toStringAsFixed(2)}' : '';
-  
+  String get formattedSubsidy =>
+      subsidyAmount > 0 ? '₹${subsidyAmount.toStringAsFixed(2)}' : '';
+
   /// Get route display text
   String get routeDisplay => '$boardingStop → $droppingStop';
 

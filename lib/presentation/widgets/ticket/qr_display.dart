@@ -28,15 +28,23 @@ class _QRDisplayWidgetState extends State<QRDisplayWidget> {
 
   Future<void> _generateQRCode() async {
     try {
-      // Generate QR data from ticket information
-      final qrData = QRService.generateTicketQRData(
-        ticketId: widget.ticket.id,
-        userId: widget.ticket.userId,
-        busId: widget.ticket.busId,
-        expiryTime: widget.ticket.expiryTime,
-        routeId: widget.ticket.routeId,
-      );
-      
+      // Use encrypted_token from API if available, otherwise generate QR data
+      String qrData;
+      if (widget.ticket.encryptedToken?.isNotEmpty ?? false) {
+        qrData = widget.ticket.encryptedToken!;
+      } else if (widget.ticket.qrCode.isNotEmpty) {
+        qrData = widget.ticket.qrCode;
+      } else {
+        // Fallback: Generate QR data from ticket information
+        qrData = QRService.generateTicketQRData(
+          ticketId: widget.ticket.id,
+          userId: widget.ticket.userId,
+          busId: widget.ticket.busId,
+          expiryTime: widget.ticket.expiryTime,
+          routeId: widget.ticket.routeId,
+        );
+      }
+
       final qrBytes = await QRService.generateQRCode(qrData, size: 200);
 
       if (mounted) {
@@ -67,8 +75,9 @@ class _QRDisplayWidgetState extends State<QRDisplayWidget> {
         ),
         boxShadow: [
           BoxShadow(
-            color: (widget.ticket.isExpired ? AppColors.error : AppColors.primary)
-                .withValues(alpha: 0.1),
+            color:
+                (widget.ticket.isExpired ? AppColors.error : AppColors.primary)
+                    .withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -82,7 +91,9 @@ class _QRDisplayWidgetState extends State<QRDisplayWidget> {
             children: [
               Icon(
                 Icons.qr_code,
-                color: widget.ticket.isExpired ? AppColors.error : AppColors.primary,
+                color: widget.ticket.isExpired
+                    ? AppColors.error
+                    : AppColors.primary,
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -91,7 +102,9 @@ class _QRDisplayWidgetState extends State<QRDisplayWidget> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: widget.ticket.isExpired ? AppColors.error : AppColors.primary,
+                  color: widget.ticket.isExpired
+                      ? AppColors.error
+                      : AppColors.primary,
                 ),
               ),
             ],
@@ -128,17 +141,25 @@ class _QRDisplayWidgetState extends State<QRDisplayWidget> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        widget.ticket.isExpired ? Icons.error : Icons.error_outline,
+                        widget.ticket.isExpired
+                            ? Icons.error
+                            : Icons.error_outline,
                         size: 48,
-                        color: widget.ticket.isExpired ? AppColors.error : AppColors.textSecondary,
+                        color: widget.ticket.isExpired
+                            ? AppColors.error
+                            : AppColors.textSecondary,
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        widget.ticket.isExpired ? 'QR CODE EXPIRED' : 'QR CODE ERROR',
+                        widget.ticket.isExpired
+                            ? 'QR CODE EXPIRED'
+                            : 'QR CODE ERROR',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: widget.ticket.isExpired ? AppColors.error : AppColors.textSecondary,
+                          color: widget.ticket.isExpired
+                              ? AppColors.error
+                              : AppColors.textSecondary,
                         ),
                       ),
                     ],
@@ -186,12 +207,12 @@ class _QRDisplayWidgetState extends State<QRDisplayWidget> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: widget.ticket.isExpired 
+              color: widget.ticket.isExpired
                   ? AppColors.error.withValues(alpha: 0.1)
                   : AppColors.success.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: widget.ticket.isExpired 
+                color: widget.ticket.isExpired
                     ? AppColors.error.withValues(alpha: 0.3)
                     : AppColors.success.withValues(alpha: 0.3),
               ),
@@ -201,7 +222,9 @@ class _QRDisplayWidgetState extends State<QRDisplayWidget> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
-                color: widget.ticket.isExpired ? AppColors.error : AppColors.success,
+                color: widget.ticket.isExpired
+                    ? AppColors.error
+                    : AppColors.success,
               ),
             ),
           ),

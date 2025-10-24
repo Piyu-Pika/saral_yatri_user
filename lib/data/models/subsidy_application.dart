@@ -195,17 +195,42 @@ extension SubsidyTypeExtension on SubsidyType {
   List<DocumentType> get requiredDocuments {
     switch (this) {
       case SubsidyType.seniorCitizen:
-        return [DocumentType.aadhaarCard, DocumentType.seniorCitizenCard, DocumentType.photo];
+        return [
+          DocumentType.aadhaarCard,
+          DocumentType.seniorCitizenCard,
+          DocumentType.photo
+        ];
       case SubsidyType.student:
-        return [DocumentType.aadhaarCard, DocumentType.studentId, DocumentType.photo];
+        return [
+          DocumentType.aadhaarCard,
+          DocumentType.studentId,
+          DocumentType.photo
+        ];
       case SubsidyType.disabledPerson:
-        return [DocumentType.aadhaarCard, DocumentType.disabilityCard, DocumentType.photo];
+        return [
+          DocumentType.aadhaarCard,
+          DocumentType.disabilityCard,
+          DocumentType.photo
+        ];
       case SubsidyType.bpl:
-        return [DocumentType.aadhaarCard, DocumentType.bplCard, DocumentType.incomeProof, DocumentType.photo];
+        return [
+          DocumentType.aadhaarCard,
+          DocumentType.bplCard,
+          DocumentType.incomeProof,
+          DocumentType.photo
+        ];
       case SubsidyType.freedomFighter:
-        return [DocumentType.aadhaarCard, DocumentType.freedomFighterCard, DocumentType.photo];
+        return [
+          DocumentType.aadhaarCard,
+          DocumentType.freedomFighterCard,
+          DocumentType.photo
+        ];
       case SubsidyType.govtEmployee:
-        return [DocumentType.aadhaarCard, DocumentType.govtEmployeeId, DocumentType.photo];
+        return [
+          DocumentType.aadhaarCard,
+          DocumentType.govtEmployeeId,
+          DocumentType.photo
+        ];
     }
   }
 }

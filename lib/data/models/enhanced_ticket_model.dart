@@ -51,7 +51,7 @@ class EnhancedTicketModel {
     // Handle different response structures
     final ticketData = json['data']?['ticket'] ?? json['ticket'] ?? json;
     final qrDataRaw = json['data']?['qr_data'] ?? json['qr_data'] ?? {};
-    
+
     return EnhancedTicketModel(
       id: ticketData['id'] ?? '',
       ticketNumber: ticketData['ticket_number'] ?? '',
@@ -61,18 +61,25 @@ class EnhancedTicketModel {
       routeId: ticketData['route_id'] ?? '',
       boardingStationId: ticketData['boarding_station_id'] ?? '',
       destinationStationId: ticketData['destination_station_id'] ?? '',
-      bookingTime: DateTime.parse(ticketData['booking_time'] ?? DateTime.now().toIso8601String()),
-      travelDate: DateTime.parse(ticketData['travel_date'] ?? DateTime.now().toIso8601String()),
-      validUntil: DateTime.parse(ticketData['valid_until'] ?? DateTime.now().toIso8601String()),
+      bookingTime: DateTime.parse(
+          ticketData['booking_time'] ?? DateTime.now().toIso8601String()),
+      travelDate: DateTime.parse(
+          ticketData['travel_date'] ?? DateTime.now().toIso8601String()),
+      validUntil: DateTime.parse(
+          ticketData['valid_until'] ?? DateTime.now().toIso8601String()),
       status: ticketData['status'] ?? '',
       fareDetails: FareDetails.fromJson(ticketData['fare_details'] ?? {}),
       qrToken: ticketData['qr_token'] ?? '',
       encryptedToken: ticketData['encrypted_token'] ?? '',
       isVerified: ticketData['is_verified'] ?? false,
-      complianceData: ComplianceData.fromJson(ticketData['compliance_data'] ?? {}),
-      paymentDetails: PaymentDetails.fromJson(ticketData['payment_details'] ?? {}),
-      createdAt: DateTime.parse(ticketData['created_at'] ?? DateTime.now().toIso8601String()),
-      updatedAt: DateTime.parse(ticketData['updated_at'] ?? DateTime.now().toIso8601String()),
+      complianceData:
+          ComplianceData.fromJson(ticketData['compliance_data'] ?? {}),
+      paymentDetails:
+          PaymentDetails.fromJson(ticketData['payment_details'] ?? {}),
+      createdAt: DateTime.parse(
+          ticketData['created_at'] ?? DateTime.now().toIso8601String()),
+      updatedAt: DateTime.parse(
+          ticketData['updated_at'] ?? DateTime.now().toIso8601String()),
       qrData: QrData.fromJson(qrDataRaw),
     );
   }
@@ -116,8 +123,10 @@ class EnhancedTicketModel {
       busNumber: busId, // Will be resolved by data resolution service
       routeId: routeId,
       routeName: routeId, // Will be resolved by data resolution service
-      boardingStop: boardingStationId, // Will be resolved by data resolution service
-      droppingStop: destinationStationId, // Will be resolved by data resolution service
+      boardingStop:
+          boardingStationId, // Will be resolved by data resolution service
+      droppingStop:
+          destinationStationId, // Will be resolved by data resolution service
       originalFare: fareDetails.baseFare,
       subsidyAmount: fareDetails.totalSubsidyAmount,
       finalFare: fareDetails.finalAmount,
@@ -215,7 +224,8 @@ class ComplianceData {
 
   factory ComplianceData.fromJson(Map<String, dynamic> json) {
     return ComplianceData(
-      revenueDate: DateTime.parse(json['revenue_date'] ?? DateTime.now().toIso8601String()),
+      revenueDate: DateTime.parse(
+          json['revenue_date'] ?? DateTime.now().toIso8601String()),
       accountingCode: json['accounting_code'] ?? '',
       revenueHead: json['revenue_head'] ?? '',
       isGovtFunded: json['is_govt_funded'] ?? false,
@@ -257,7 +267,8 @@ class PaymentDetails {
       paymentMethod: json['payment_method'] ?? '',
       transactionId: json['transaction_id'] ?? '',
       paymentStatus: json['payment_status'] ?? '',
-      paymentTime: DateTime.parse(json['payment_time'] ?? DateTime.now().toIso8601String()),
+      paymentTime: DateTime.parse(
+          json['payment_time'] ?? DateTime.now().toIso8601String()),
     );
   }
 

@@ -3,11 +3,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageService {
   static SharedPreferences? _prefs;
-  
+
   static Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
   }
-  
+
   static Future<bool> setString(String key, String value) async {
     try {
       _prefs ??= await SharedPreferences.getInstance();
@@ -17,7 +17,7 @@ class StorageService {
       return false;
     }
   }
-  
+
   static String? getString(String key) {
     try {
       return _prefs?.getString(key);
@@ -26,7 +26,7 @@ class StorageService {
       return null;
     }
   }
-  
+
   static Future<bool> setBool(String key, bool value) async {
     try {
       _prefs ??= await SharedPreferences.getInstance();
@@ -36,7 +36,7 @@ class StorageService {
       return false;
     }
   }
-  
+
   static bool? getBool(String key) {
     try {
       return _prefs?.getBool(key);
@@ -45,7 +45,7 @@ class StorageService {
       return null;
     }
   }
-  
+
   static Future<bool> setObject(String key, Map<String, dynamic> value) async {
     try {
       final jsonString = jsonEncode(value);
@@ -55,7 +55,7 @@ class StorageService {
       return false;
     }
   }
-  
+
   static Map<String, dynamic>? getObject(String key) {
     try {
       final jsonString = getString(key);
@@ -68,7 +68,7 @@ class StorageService {
       return null;
     }
   }
-  
+
   static Future<bool> remove(String key) async {
     try {
       _prefs ??= await SharedPreferences.getInstance();
@@ -78,7 +78,7 @@ class StorageService {
       return false;
     }
   }
-  
+
   static Future<bool> clear() async {
     try {
       _prefs ??= await SharedPreferences.getInstance();

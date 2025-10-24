@@ -25,33 +25,30 @@ void main() {
           'expected': '(AtlasError) you are over your space quota'
         },
         {
-          'input': {'errors': ['Invalid bus ID', 'Invalid route ID']},
+          'input': {
+            'errors': ['Invalid bus ID', 'Invalid route ID']
+          },
           'expected': 'Invalid bus ID, Invalid route ID'
         },
         {
-          'input': {'errors': {'bus_id': 'Required', 'route_id': 'Invalid'}},
+          'input': {
+            'errors': {'bus_id': 'Required', 'route_id': 'Invalid'}
+          },
           'expected': 'Required, Invalid'
         },
-        {
-          'input': 'Simple string error',
-          'expected': 'Simple string error'
-        },
-        {
-          'input': null,
-          'expected': 'Default message'
-        },
+        {'input': 'Simple string error', 'expected': 'Simple string error'},
+        {'input': null, 'expected': 'Default message'},
       ];
 
       for (final testCase in testCases) {
         final result = repository.extractErrorMessage(
-          testCase['input'], 
-          'Default message'
-        );
+            testCase['input'], 'Default message');
         expect(result, equals(testCase['expected']));
       }
     });
 
-    test('should provide user-friendly error messages for common server errors', () {
+    test('should provide user-friendly error messages for common server errors',
+        () {
       final serverErrors = [
         'you are over your space quota',
         'AtlasError',

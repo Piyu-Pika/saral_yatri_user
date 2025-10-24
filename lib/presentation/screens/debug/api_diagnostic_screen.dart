@@ -11,7 +11,8 @@ class ApiDiagnosticScreen extends ConsumerStatefulWidget {
   const ApiDiagnosticScreen({super.key});
 
   @override
-  ConsumerState<ApiDiagnosticScreen> createState() => _ApiDiagnosticScreenState();
+  ConsumerState<ApiDiagnosticScreen> createState() =>
+      _ApiDiagnosticScreenState();
 }
 
 class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
@@ -97,7 +98,7 @@ class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
 
     try {
       final fixes = await _diagnosticHelper.attemptQuickFixes();
-      
+
       // Show fixes result
       if (mounted) {
         showDialog(
@@ -141,15 +142,14 @@ class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
           ),
         );
       }
-      
+
       // Re-run diagnostics after fixes
       await _runDiagnostics();
-      
     } catch (e) {
       setState(() {
         _isRunning = false;
       });
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Quick fixes failed: $e')),
@@ -175,7 +175,8 @@ class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                border:
+                    Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -211,9 +212,9 @@ class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Action buttons
             Column(
               children: [
@@ -222,14 +223,16 @@ class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: _isRunning ? null : _runDiagnostics,
-                        icon: _isRunning 
+                        icon: _isRunning
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
                               )
                             : const Icon(Icons.play_arrow),
-                        label: Text(_isRunning ? 'Running...' : 'Basic Diagnostics'),
+                        label: Text(
+                            _isRunning ? 'Running...' : 'Basic Diagnostics'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
@@ -240,7 +243,9 @@ class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: _isRunning || _results == null ? null : _attemptQuickFixes,
+                        onPressed: _isRunning || _results == null
+                            ? null
+                            : _attemptQuickFixes,
                         icon: const Icon(Icons.build),
                         label: const Text('Quick Fixes'),
                         style: ElevatedButton.styleFrom(
@@ -258,14 +263,16 @@ class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: _isRunning ? null : _runComprehensiveTest,
-                        icon: _isRunning 
+                        icon: _isRunning
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
                               )
                             : const Icon(Icons.verified),
-                        label: Text(_isRunning ? 'Running...' : 'Comprehensive Test'),
+                        label: Text(
+                            _isRunning ? 'Running...' : 'Comprehensive Test'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                           foregroundColor: Colors.white,
@@ -277,14 +284,16 @@ class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: _isRunning ? null : _runTicketDiagnostic,
-                        icon: _isRunning 
+                        icon: _isRunning
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
                               )
                             : const Icon(Icons.bug_report),
-                        label: Text(_isRunning ? 'Running...' : 'Ticket Diagnostic'),
+                        label: Text(
+                            _isRunning ? 'Running...' : 'Ticket Diagnostic'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
                           foregroundColor: Colors.white,
@@ -296,9 +305,9 @@ class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Results
             if (_results != null) ...[
               const Text(
@@ -344,7 +353,7 @@ class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
 
   Widget _buildResultsView() {
     if (_results == null) return const SizedBox();
-    
+
     if (_results!['error'] != null) {
       return Container(
         padding: const EdgeInsets.all(16),
@@ -386,9 +395,9 @@ class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
         children: [
           // Summary
           if (_results!['summary'] != null) _buildSummaryCard(),
-          
+
           const SizedBox(height: 16),
-          
+
           // Detailed results
           ..._buildDetailedResults(),
         ],
@@ -401,14 +410,18 @@ class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
     final totalTests = summary['totalTests'] ?? 0;
     final passedTests = summary['passedTests'] ?? 0;
     final issues = summary['issues'] as List? ?? [];
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: issues.isEmpty ? Colors.green.withValues(alpha: 0.1) : Colors.orange.withValues(alpha: 0.1),
+        color: issues.isEmpty
+            ? Colors.green.withValues(alpha: 0.1)
+            : Colors.orange.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: issues.isEmpty ? Colors.green.withValues(alpha: 0.3) : Colors.orange.withValues(alpha: 0.3),
+          color: issues.isEmpty
+              ? Colors.green.withValues(alpha: 0.3)
+              : Colors.orange.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -440,9 +453,9 @@ class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
               style: TextStyle(fontWeight: FontWeight.w600),
             ),
             ...issues.map((issue) => Padding(
-              padding: const EdgeInsets.only(left: 16, top: 4),
-              child: Text('• $issue'),
-            )),
+                  padding: const EdgeInsets.only(left: 16, top: 4),
+                  child: Text('• $issue'),
+                )),
           ],
           if (summary['recommendations'] != null) ...[
             const SizedBox(height: 8),
@@ -451,9 +464,9 @@ class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
               style: TextStyle(fontWeight: FontWeight.w600),
             ),
             ...(summary['recommendations'] as List).map((rec) => Padding(
-              padding: const EdgeInsets.only(left: 16, top: 4),
-              child: Text('• $rec'),
-            )),
+                  padding: const EdgeInsets.only(left: 16, top: 4),
+                  child: Text('• $rec'),
+                )),
           ],
         ],
       ),
@@ -462,16 +475,22 @@ class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
 
   List<Widget> _buildDetailedResults() {
     final widgets = <Widget>[];
-    
-    final categories = ['stations', 'routes', 'buses', 'fareCalculation', 'tickets'];
+
+    final categories = [
+      'stations',
+      'routes',
+      'buses',
+      'fareCalculation',
+      'tickets'
+    ];
     final categoryNames = {
       'stations': 'Station APIs',
       'routes': 'Route APIs',
-      'buses': 'Bus APIs', 
+      'buses': 'Bus APIs',
       'fareCalculation': 'Fare Calculation',
       'tickets': 'Ticket Operations',
     };
-    
+
     for (final category in categories) {
       if (_results![category] != null) {
         widgets.add(_buildCategoryCard(
@@ -481,14 +500,14 @@ class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
         widgets.add(const SizedBox(height: 12));
       }
     }
-    
+
     return widgets;
   }
 
   Widget _buildCategoryCard(String title, Map<String, dynamic> data) {
     final hasError = data['error'] != null;
     final tests = data.entries.where((e) => e.key != 'error').toList();
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -507,7 +526,6 @@ class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          
           if (hasError) ...[
             Container(
               padding: const EdgeInsets.all(12),
@@ -538,11 +556,11 @@ class _ApiDiagnosticScreenState extends ConsumerState<ApiDiagnosticScreen> {
 
   Widget _buildTestResult(String testName, dynamic testData) {
     if (testData is! Map<String, dynamic>) return const SizedBox();
-    
+
     final success = testData['success'] == true;
     final icon = success ? Icons.check_circle : Icons.error;
     final color = success ? Colors.green : Colors.red;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(

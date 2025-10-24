@@ -23,7 +23,8 @@ void main() {
       expect(requestData['bus_id'], equals(busId));
       expect(requestData['route_id'], equals(routeId));
       expect(requestData['boarding_station_id'], equals(boardingStationId));
-      expect(requestData['destination_station_id'], equals(destinationStationId));
+      expect(
+          requestData['destination_station_id'], equals(destinationStationId));
       expect(requestData['ticket_type'], equals(ticketType));
       expect(requestData['travel_date'], equals("2024-01-15T10:00:00.000Z"));
 
@@ -39,11 +40,12 @@ void main() {
     test('should handle current date correctly', () {
       final now = DateTime.now();
       final formattedDate = now.toUtc().toIso8601String();
-      
+
       // Verify the date format contains the required components
       expect(formattedDate, contains('T'));
       expect(formattedDate, endsWith('Z'));
-      expect(formattedDate.length, greaterThan(19)); // At least YYYY-MM-DDTHH:mm:ssZ
+      expect(formattedDate.length,
+          greaterThan(19)); // At least YYYY-MM-DDTHH:mm:ssZ
     });
   });
 }

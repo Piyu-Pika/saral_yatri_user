@@ -3,7 +3,8 @@ import '../../core/services/api_service.dart';
 import '../../core/constants/api_constants.dart';
 import '../models/station_model.dart';
 
-final stationProvider = StateNotifierProvider<StationNotifier, StationState>((ref) {
+final stationProvider =
+    StateNotifierProvider<StationNotifier, StationState>((ref) {
   final apiService = ref.watch(apiServiceProvider);
   return StationNotifier(apiService);
 });
@@ -46,7 +47,7 @@ class StationNotifier extends StateNotifier<StationState> {
 
     try {
       final response = await _apiService.get(ApiConstants.activeStations);
-      
+
       // Handle both single station and list of stations response
       List<dynamic> stationsData;
       if (response.data['data'] is List) {
@@ -57,7 +58,7 @@ class StationNotifier extends StateNotifier<StationState> {
       } else {
         stationsData = [];
       }
-      
+
       final stations = <StationModel>[];
       for (int i = 0; i < stationsData.length; i++) {
         try {
@@ -93,7 +94,7 @@ class StationNotifier extends StateNotifier<StationState> {
       final response = await _apiService.get(
         '${ApiConstants.searchStations}?q=$query',
       );
-      
+
       // Handle both single station and list of stations response
       List<dynamic> stationsData;
       if (response.data['data'] is List) {
@@ -103,7 +104,7 @@ class StationNotifier extends StateNotifier<StationState> {
       } else {
         stationsData = [];
       }
-      
+
       final stations = <StationModel>[];
       for (int i = 0; i < stationsData.length; i++) {
         try {
@@ -132,7 +133,7 @@ class StationNotifier extends StateNotifier<StationState> {
       final response = await _apiService.get(
         '${ApiConstants.nearbyStations}?lat=$latitude&lng=$longitude',
       );
-      
+
       // Handle both single station and list of stations response
       List<dynamic> stationsData;
       if (response.data['data'] is List) {
@@ -142,7 +143,7 @@ class StationNotifier extends StateNotifier<StationState> {
       } else {
         stationsData = [];
       }
-      
+
       final nearbyStations = <StationModel>[];
       for (int i = 0; i < stationsData.length; i++) {
         try {
@@ -165,21 +166,23 @@ class StationNotifier extends StateNotifier<StationState> {
     state = state.copyWith(isLoading: true);
 
     try {
-      final response = await _apiService.get('/routes/$routeId/stations/active');
-      
+      final response =
+          await _apiService.get('/routes/$routeId/stations/active');
+
       List<dynamic> stationsData;
       if (response.data['data'] is List) {
         stationsData = response.data['data'] as List;
       } else {
         stationsData = [];
       }
-      
+
       final stations = <StationModel>[];
       for (int i = 0; i < stationsData.length; i++) {
         try {
           final stationData = stationsData[i];
           // The backend returns station with distance_from_start
-          final station = StationModel.fromJson(stationData['station'], sequence: i + 1);
+          final station =
+              StationModel.fromJson(stationData['station'], sequence: i + 1);
           stations.add(station);
         } catch (e) {
           print('Error parsing route station at index $i: $e');

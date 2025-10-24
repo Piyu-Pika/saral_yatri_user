@@ -4,7 +4,7 @@ import '../constants/api_constants.dart';
 
 class ApiClient {
   static const String baseUrl = ApiConstants.baseUrl;
-  
+
   late Dio _dio;
   String? _token;
 
@@ -23,7 +23,8 @@ class ApiClient {
       InterceptorsWrapper(
         onRequest: (options, handler) {
           if (_token != null) {
-            options.headers['Authorization'] = '${ApiConstants.bearerPrefix} $_token';
+            options.headers['Authorization'] =
+                '${ApiConstants.bearerPrefix} $_token';
           }
           return handler.next(options);
         },

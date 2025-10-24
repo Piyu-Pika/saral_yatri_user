@@ -13,7 +13,7 @@ class SubsidyService {
       AppLogger.info('[SubsidyService] Submitting application...');
       final requestData = request.toJson();
       AppLogger.info('[SubsidyService] Request data: $requestData');
-      
+
       final response = await ApiClient.post(
         ApiConstants.submitSubsidyApplication,
         data: requestData,
@@ -40,22 +40,25 @@ class SubsidyService {
 
       AppLogger.info('[SubsidyService] Response received: ${response.data}');
       final applicationsData = response.data['applications'];
-      
+
       // Handle case when applications is null (no applications yet)
       if (applicationsData == null) {
-        AppLogger.info('[SubsidyService] No applications found (null response)');
+        AppLogger.info(
+            '[SubsidyService] No applications found (null response)');
         return [];
       }
-      
+
       // Handle case when applications is not a list
       if (applicationsData is! List) {
-        AppLogger.warning('[SubsidyService] Applications data is not a list: ${applicationsData.runtimeType}');
+        AppLogger.warning(
+            '[SubsidyService] Applications data is not a list: ${applicationsData.runtimeType}');
         return [];
       }
-      
+
       final List<dynamic> applicationsJson = applicationsData;
-      AppLogger.info('[SubsidyService] Found ${applicationsJson.length} applications');
-      
+      AppLogger.info(
+          '[SubsidyService] Found ${applicationsJson.length} applications');
+
       return applicationsJson
           .map((json) => SubsidyApplication.fromJson(json))
           .toList();
@@ -92,7 +95,7 @@ class SubsidyService {
         return e.response!.data['message'];
       }
     }
-    
+
     switch (e.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.receiveTimeout:

@@ -69,8 +69,7 @@ class _CustomTextFieldState extends State<CustomTextField>
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    
-    
+
     _borderColorAnimation = ColorTween(
       begin: Colors.grey[300],
       end: AppTheme.primaryColor,
@@ -78,7 +77,7 @@ class _CustomTextFieldState extends State<CustomTextField>
       parent: _animationController,
       curve: Curves.easeInOut,
     ));
-    
+
     _focusNode = widget.focusNode ?? FocusNode();
     _focusNode.addListener(_onFocusChange);
   }
@@ -216,7 +215,8 @@ class _CustomTextFieldState extends State<CustomTextField>
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(widget.borderRadius),
                     borderSide: BorderSide(
-                      color: _borderColorAnimation.value ?? AppTheme.primaryColor,
+                      color:
+                          _borderColorAnimation.value ?? AppTheme.primaryColor,
                       width: 2.0,
                     ),
                   ),
@@ -244,9 +244,7 @@ class _CustomTextFieldState extends State<CustomTextField>
                   filled: true,
                   fillColor: widget.fillColor ??
                       (widget.enabled
-                          ? (_isFocused
-                              ? Colors.white
-                              : Colors.grey[50])
+                          ? (_isFocused ? Colors.white : Colors.grey[50])
                           : Colors.grey[100]),
                   contentPadding: widget.contentPadding ??
                       EdgeInsets.symmetric(

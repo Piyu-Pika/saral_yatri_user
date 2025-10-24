@@ -41,7 +41,7 @@ class SubsidyNotifier extends Notifier<SubsidyState> {
 
   Future<void> loadApplications() async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final applications = await _subsidyService.getMyApplications();
       state = state.copyWith(
@@ -58,18 +58,18 @@ class SubsidyNotifier extends Notifier<SubsidyState> {
 
   Future<bool> submitApplication(SubsidyApplicationRequest request) async {
     state = state.copyWith(isSubmitting: true, error: null);
-    
+
     try {
       final newApplication = await _subsidyService.submitApplication(request);
-      
+
       // Add the new application to the list
       final updatedApplications = [newApplication, ...state.applications];
-      
+
       state = state.copyWith(
         applications: updatedApplications,
         isSubmitting: false,
       );
-      
+
       return true;
     } catch (e) {
       state = state.copyWith(
@@ -80,7 +80,8 @@ class SubsidyNotifier extends Notifier<SubsidyState> {
     }
   }
 
-  Future<SubsidyApplication?> getApplicationDetails(String applicationId) async {
+  Future<SubsidyApplication?> getApplicationDetails(
+      String applicationId) async {
     try {
       return await _subsidyService.getApplicationDetails(applicationId);
     } catch (e) {

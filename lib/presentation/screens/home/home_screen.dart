@@ -12,7 +12,6 @@ import '../../widgets/bus_marker.dart';
 import '../../widgets/bus_stop_marker.dart';
 import '../profile/profile_screen.dart';
 
-
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -23,7 +22,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final MapController _mapController = MapController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  
+
   LatLng _currentLocation = const LatLng(28.6139, 77.2090); // Default Delhi
   bool _isLocationLoaded = false;
 
@@ -41,15 +40,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         _currentLocation = LatLng(position.latitude, position.longitude);
         _isLocationLoaded = true;
       });
-      
+
       // Move map to current location
       _mapController.move(_currentLocation, 15.0);
-      
+
       // Load nearby buses
       ref.read(busProvider.notifier).loadNearbyBuses(
-        position.latitude,
-        position.longitude,
-      );
+            position.latitude,
+            position.longitude,
+          );
     }
   }
 
@@ -69,7 +68,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   //   try {
   //     // Test API call to see logging in action
   //     await ref.read(busProvider.notifier).loadAllBuses();
-      
+
   //     if (mounted) {
   //       ScaffoldMessenger.of(context).showSnackBar(
   //         const SnackBar(
@@ -94,7 +93,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
     final busState = ref.watch(busProvider);
-    
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -118,9 +117,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               }
             },
             itemBuilder: (context) => [
-               PopupMenuItem(
-                onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
+              PopupMenuItem(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const ProfileScreen()));
                 },
                 value: 'profile',
                 child: const ListTile(
@@ -129,7 +129,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
               PopupMenuItem(
-                onTap: (){
+                onTap: () {
                   Navigator.pushNamed(context, '/ticket');
                 },
                 value: 'tickets',
@@ -167,7 +167,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.saralyatri.app',
               ),
-              
+
               // Bus Stop Markers
               MarkerLayer(
                 markers: busState.busStops.map((busStop) {
@@ -179,7 +179,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   );
                 }).toList(),
               ),
-              
+
               // Bus Markers
               MarkerLayer(
                 markers: busState.buses.map((bus) {
@@ -191,7 +191,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   );
                 }).toList(),
               ),
-              
+
               // Current Location Marker
               if (_isLocationLoaded)
                 MarkerLayer(
@@ -212,7 +212,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
             ],
           ),
-          
+
           // Welcome Card
           Positioned(
             top: 16,
@@ -244,7 +244,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
           ),
-          
+
           // Quick Actions
           Positioned(
             bottom: 100,
@@ -267,12 +267,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Navigator.pushNamed(context, '/my-tickets');
                   },
                   backgroundColor: AppTheme.secondaryColor,
-                  child: const Icon(Icons.confirmation_number, color: Colors.white),
+                  child: const Icon(Icons.confirmation_number,
+                      color: Colors.white),
                 ),
               ],
             ),
           ),
-          
+
           // Loading Indicator
           if (busState.isLoading)
             const Positioned(

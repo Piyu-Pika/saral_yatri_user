@@ -31,9 +31,10 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    
+
     // Get arguments from route
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     if (args != null && _bus == null) {
       setState(() {
         _bus = args['bus'] as BusModel?;
@@ -203,13 +204,14 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   Future<void> _processPayment() async {
     print('🔍 DEBUG: Starting payment process...');
     print('🔍 DEBUG: Bus: ${_bus?.id} (${_bus?.busNumber})');
-    print('🔍 DEBUG: Boarding: ${_boardingStation?.id} (${_boardingStation?.name})');
+    print(
+        '🔍 DEBUG: Boarding: ${_boardingStation?.id} (${_boardingStation?.name})');
     print('🔍 DEBUG: Drop: ${_dropStation?.id} (${_dropStation?.name})');
     print('🔍 DEBUG: Fare Data: $_fareData');
     print('🔍 DEBUG: Payment Method: $_paymentMethod');
     print('🔍 DEBUG: Ticket Type: $_ticketType');
     print('🔍 DEBUG: Travel Date: $_travelDate');
-    
+
     if (_bus == null ||
         _boardingStation == null ||
         _dropStation == null ||
@@ -274,10 +276,10 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
       // Step 4: Book the ticket
       print('🎫 DEBUG: Starting ticket booking...');
       print('🎫 DEBUG: API Payment Mode: $apiPaymentMode');
-      
+
       bool success = false;
       EnhancedTicketModel? enhancedTicket;
-      
+
       try {
         // Try enhanced booking first for QR data
         print('🎫 DEBUG: Attempting enhanced booking...');
@@ -290,9 +292,9 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
               ticketType: _ticketType,
               travelDate: _travelDate ?? DateTime.now(),
             );
-        
+
         print('🎫 DEBUG: Enhanced booking success: $success');
-        
+
         if (success) {
           final currentState = ref.read(ticketProvider);
           enhancedTicket = currentState.currentEnhancedTicket;
@@ -339,7 +341,8 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => QrTicketScreen(ticket: enhancedTicket!),
+                builder: (context) =>
+                    QrTicketScreen(ticket: enhancedTicket!.toTicketModel()),
               ),
             );
           } else {

@@ -7,15 +7,15 @@ class ApiTestHelper {
   static Future<void> testMyTicketsApi() async {
     try {
       Log.i('Testing my-tickets API endpoint...');
-      
+
       final response = await ApiClient.get(ApiConstants.myTickets);
-      
+
       Log.i('API Response Status: ${response.statusCode}');
       Log.i('API Response Data: ${response.data}');
-      
+
       if (response.statusCode == 200) {
         Log.i('✅ My-tickets API is working correctly');
-        
+
         // Check response structure
         final data = response.data;
         if (data is Map<String, dynamic>) {
@@ -29,15 +29,15 @@ class ApiTestHelper {
       Log.e('❌ My-tickets API test failed: $e');
     }
   }
-  
+
   /// Test API connectivity
   static Future<bool> testApiConnectivity() async {
     try {
       Log.i('Testing API connectivity...');
-      
+
       // Try a simple endpoint that doesn't require auth
       final response = await ApiClient.get('/health');
-      
+
       if (response.statusCode == 200) {
         Log.i('✅ API is reachable');
         return true;

@@ -52,7 +52,8 @@ class EnhancedTicketDisplayModel {
   String get routeDisplay => '$boardingStationName → $destinationStationName';
 
   /// Get full route description
-  String get fullRouteDescription => '$routeName: $boardingStationName → $destinationStationName';
+  String get fullRouteDescription =>
+      '$routeName: $boardingStationName → $destinationStationName';
 
   /// Get bus display text
   String get busDisplay => '$busNumber';
@@ -87,7 +88,8 @@ class EnhancedTicketDisplayModel {
     return EnhancedTicketDisplayModel(
       ticket: ticket,
       boardingStationName: boardingStationName ?? this.boardingStationName,
-      destinationStationName: destinationStationName ?? this.destinationStationName,
+      destinationStationName:
+          destinationStationName ?? this.destinationStationName,
       busNumber: busNumber ?? this.busNumber,
       routeName: routeName ?? this.routeName,
       isDataResolved: true,

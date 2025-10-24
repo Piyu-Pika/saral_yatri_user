@@ -86,7 +86,8 @@ class Validators {
 
     // Indian vehicle registration format
     final busRegex = RegExp(r'^[A-Z]{2}[0-9]{1,2}[A-Z]{1,2}[0-9]{1,4}$');
-    if (!busRegex.hasMatch(value.toUpperCase().replaceAll(' ', '').replaceAll('-', ''))) {
+    if (!busRegex.hasMatch(
+        value.toUpperCase().replaceAll(' ', '').replaceAll('-', ''))) {
       return 'Please enter a valid bus number (e.g., MH-01-AB-1234)';
     }
 

@@ -6,18 +6,17 @@ class PermissionService {
     try {
       // Request location permission
       await _requestLocationPermission();
-      
+
       // Request camera permission
       await _requestCameraPermission();
-      
+
       // Request notification permission
       await _requestNotificationPermission();
-      
     } catch (e) {
       Log.e('Error requesting permissions: $e');
     }
   }
-  
+
   static Future<bool> _requestLocationPermission() async {
     final status = await Permission.location.request();
     if (status.isGranted) {
@@ -28,7 +27,7 @@ class PermissionService {
       return false;
     }
   }
-  
+
   static Future<bool> _requestCameraPermission() async {
     final status = await Permission.camera.request();
     if (status.isGranted) {
@@ -39,7 +38,7 @@ class PermissionService {
       return false;
     }
   }
-  
+
   static Future<bool> _requestNotificationPermission() async {
     final status = await Permission.notification.request();
     if (status.isGranted) {
@@ -50,11 +49,11 @@ class PermissionService {
       return false;
     }
   }
-  
+
   static Future<bool> hasLocationPermission() async {
     return await Permission.location.isGranted;
   }
-  
+
   static Future<bool> hasCameraPermission() async {
     return await Permission.camera.isGranted;
   }

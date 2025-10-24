@@ -9,10 +9,12 @@ class TicketVerificationScreen extends ConsumerStatefulWidget {
   const TicketVerificationScreen({super.key});
 
   @override
-  ConsumerState<TicketVerificationScreen> createState() => _TicketVerificationScreenState();
+  ConsumerState<TicketVerificationScreen> createState() =>
+      _TicketVerificationScreenState();
 }
 
-class _TicketVerificationScreenState extends ConsumerState<TicketVerificationScreen> {
+class _TicketVerificationScreenState
+    extends ConsumerState<TicketVerificationScreen> {
   TicketModel? _scannedTicket;
   String? _errorMessage;
   bool _isVerifying = false;
@@ -27,7 +29,7 @@ class _TicketVerificationScreenState extends ConsumerState<TicketVerificationScr
       // Verify ticket with backend
       final ticketService = ref.read(ticketServiceProvider);
       final ticket = await ticketService.verifyTicket(qrData['ticket_id']);
-      
+
       if (ticket != null) {
         setState(() {
           _scannedTicket = ticket;
@@ -107,12 +109,10 @@ class _TicketVerificationScreenState extends ConsumerState<TicketVerificationScr
             ),
 
           // Verification result
-          if (_scannedTicket != null)
-            _buildVerificationResult(),
+          if (_scannedTicket != null) _buildVerificationResult(),
 
           // Error display
-          if (_errorMessage != null)
-            _buildErrorDisplay(),
+          if (_errorMessage != null) _buildErrorDisplay(),
 
           // Loading overlay
           if (_isVerifying)
@@ -295,9 +295,7 @@ class _TicketVerificationScreenState extends ConsumerState<TicketVerificationScr
                   color: Colors.white,
                 ),
               ),
-
               const SizedBox(height: 20),
-
               const Text(
                 'SCAN ERROR',
                 style: TextStyle(
@@ -306,9 +304,7 @@ class _TicketVerificationScreenState extends ConsumerState<TicketVerificationScr
                   color: AppColors.error,
                 ),
               ),
-
               const SizedBox(height: 16),
-
               Text(
                 _errorMessage!,
                 style: const TextStyle(
@@ -317,9 +313,7 @@ class _TicketVerificationScreenState extends ConsumerState<TicketVerificationScr
                 ),
                 textAlign: TextAlign.center,
               ),
-
               const SizedBox(height: 40),
-
               ElevatedButton(
                 onPressed: _resetScanner,
                 style: ElevatedButton.styleFrom(
@@ -347,7 +341,7 @@ class _TicketVerificationScreenState extends ConsumerState<TicketVerificationScr
     try {
       final ticketService = ref.read(ticketServiceProvider);
       await ticketService.markTicketAsUsed(ticket.id);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

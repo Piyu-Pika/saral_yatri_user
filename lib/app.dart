@@ -37,19 +37,16 @@ class SaralYatriApp extends ConsumerWidget {
         '/payment': (context) => const PaymentScreen(),
         '/my-tickets': (context) => const MyTicketsScreen(),
         '/ticket': (context) => const TicketScreen(),
-        '/qr-ticket-demo': (context) => QrTicketScreen(
-          ticket: MockTicketService.createMockEnhancedTicket(),
-        ),
+
         '/qr-ticket': (context) {
-          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          final args = ModalRoute.of(context)?.settings.arguments
+              as Map<String, dynamic>?;
           final ticket = args?['ticket'];
           if (ticket != null) {
             return QrTicketScreen(ticket: ticket);
           }
-          // Fallback to demo ticket if no ticket provided
-          return QrTicketScreen(
-            ticket: MockTicketService.createMockEnhancedTicket(),
-          );
+          // Fallback: navigate to my tickets if no ticket provided
+          return const MyTicketsScreen();
         },
         '/qr-scanner': (context) => const QRScannerScreen(),
         '/profile': (context) => const ProfileScreen(),

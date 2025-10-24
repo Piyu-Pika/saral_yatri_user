@@ -55,7 +55,7 @@ class _PaymentOptionsState extends State<PaymentOptions> {
           ),
         ),
         const SizedBox(height: 16),
-        
+
         // UPI Payment
         _PaymentOptionTile(
           method: PaymentMethod.upi,
@@ -65,9 +65,9 @@ class _PaymentOptionsState extends State<PaymentOptions> {
           isSelected: _selectedMethod == PaymentMethod.upi,
           onTap: () => _selectMethod(PaymentMethod.upi),
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         // Card Payment
         _PaymentOptionTile(
           method: PaymentMethod.card,
@@ -77,9 +77,9 @@ class _PaymentOptionsState extends State<PaymentOptions> {
           isSelected: _selectedMethod == PaymentMethod.card,
           onTap: () => _selectMethod(PaymentMethod.card),
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         // Net Banking
         _PaymentOptionTile(
           method: PaymentMethod.netBanking,
@@ -89,9 +89,9 @@ class _PaymentOptionsState extends State<PaymentOptions> {
           isSelected: _selectedMethod == PaymentMethod.netBanking,
           onTap: () => _selectMethod(PaymentMethod.netBanking),
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         // Wallet
         _PaymentOptionTile(
           method: PaymentMethod.wallet,
@@ -101,7 +101,7 @@ class _PaymentOptionsState extends State<PaymentOptions> {
           isSelected: _selectedMethod == PaymentMethod.wallet,
           onTap: () => _selectMethod(PaymentMethod.wallet),
         ),
-        
+
         // Cash option (if enabled)
         if (widget.showCashOption) ...[
           const SizedBox(height: 12),
@@ -156,7 +156,7 @@ class _PaymentOptionTile extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: isSelected 
+                color: isSelected
                     ? AppColors.primary.withValues(alpha: 0.1)
                     : Colors.grey[100],
                 borderRadius: BorderRadius.circular(8),
@@ -177,7 +177,9 @@ class _PaymentOptionTile extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),

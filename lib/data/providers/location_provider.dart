@@ -3,7 +3,8 @@ import 'package:geolocator/geolocator.dart';
 import '../../core/services/location_service.dart';
 import '../../core/utils/logger.dart';
 
-final locationProvider = StateNotifierProvider<LocationNotifier, LocationState>((ref) {
+final locationProvider =
+    StateNotifierProvider<LocationNotifier, LocationState>((ref) {
   return LocationNotifier();
 });
 
@@ -52,7 +53,8 @@ class LocationNotifier extends StateNotifier<LocationState> {
         state = state.copyWith(
           isLoading: false,
           isServiceEnabled: false,
-          error: 'Location services are disabled. Please enable location services.',
+          error:
+              'Location services are disabled. Please enable location services.',
         );
         return;
       }
@@ -65,7 +67,8 @@ class LocationNotifier extends StateNotifier<LocationState> {
           state = state.copyWith(
             isLoading: false,
             hasPermission: false,
-            error: 'Location permissions are denied. Please grant location permission.',
+            error:
+                'Location permissions are denied. Please grant location permission.',
           );
           return;
         }
@@ -75,7 +78,8 @@ class LocationNotifier extends StateNotifier<LocationState> {
         state = state.copyWith(
           isLoading: false,
           hasPermission: false,
-          error: 'Location permissions are permanently denied. Please enable them in settings.',
+          error:
+              'Location permissions are permanently denied. Please enable them in settings.',
         );
         return;
       }
@@ -89,7 +93,8 @@ class LocationNotifier extends StateNotifier<LocationState> {
           hasPermission: true,
           isServiceEnabled: true,
         );
-        AppLogger.info('Location updated: ${position.latitude}, ${position.longitude}');
+        AppLogger.info(
+            'Location updated: ${position.latitude}, ${position.longitude}');
       } else {
         state = state.copyWith(
           isLoading: false,
@@ -111,7 +116,7 @@ class LocationNotifier extends StateNotifier<LocationState> {
 
   double? calculateDistanceToStation(double stationLat, double stationLng) {
     if (state.currentPosition == null) return null;
-    
+
     return LocationService.calculateDistance(
       state.currentPosition!.latitude,
       state.currentPosition!.longitude,

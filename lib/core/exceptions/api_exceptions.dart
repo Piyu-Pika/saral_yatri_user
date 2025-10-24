@@ -20,7 +20,7 @@ class AuthException extends ApiException {
 }
 
 class ServerException extends ApiException {
-  ServerException(super.message, int statusCode) 
+  ServerException(super.message, int statusCode)
       : super(statusCode: statusCode);
 }
 

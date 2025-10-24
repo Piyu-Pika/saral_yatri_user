@@ -3,7 +3,8 @@ import '../../core/services/api_service.dart';
 import '../../core/constants/api_constants.dart';
 import '../models/ticket_model.dart';
 
-final ticketProvider = StateNotifierProvider<TicketNotifier, TicketState>((ref) {
+final ticketProvider =
+    StateNotifierProvider<TicketNotifier, TicketState>((ref) {
   final apiService = ref.watch(apiServiceProvider);
   return TicketNotifier(apiService);
 });
@@ -47,7 +48,8 @@ class TicketNotifier extends StateNotifier<TicketState> {
     try {
       final response = await _apiService.get(ApiConstants.myTickets);
       final ticketsData = response.data['data'] as List;
-      final tickets = ticketsData.map((data) => TicketModel.fromJson(data)).toList();
+      final tickets =
+          ticketsData.map((data) => TicketModel.fromJson(data)).toList();
 
       state = state.copyWith(
         tickets: tickets,
@@ -65,7 +67,8 @@ class TicketNotifier extends StateNotifier<TicketState> {
     state = state.copyWith(isLoading: true);
 
     try {
-      final response = await _apiService.post(ApiConstants.bookTicket, data: bookingData);
+      final response =
+          await _apiService.post(ApiConstants.bookTicket, data: bookingData);
       final ticketData = response.data['data'];
       final ticket = TicketModel.fromJson(ticketData);
 
@@ -138,7 +141,8 @@ class TicketNotifier extends StateNotifier<TicketState> {
 
   Future<void> loadTicketDetails(String ticketId) async {
     try {
-      final response = await _apiService.get('${ApiConstants.ticketDetails}/$ticketId');
+      final response =
+          await _apiService.get('${ApiConstants.ticketDetails}/$ticketId');
       final ticketData = response.data['data'];
       final ticket = TicketModel.fromJson(ticketData);
 
@@ -160,7 +164,8 @@ class TicketNotifier extends StateNotifier<TicketState> {
     try {
       final response = await _apiService.get(ApiConstants.myActiveTickets);
       final ticketsData = response.data['data'] as List;
-      final tickets = ticketsData.map((data) => TicketModel.fromJson(data)).toList();
+      final tickets =
+          ticketsData.map((data) => TicketModel.fromJson(data)).toList();
 
       state = state.copyWith(
         tickets: tickets,
@@ -177,7 +182,8 @@ class TicketNotifier extends StateNotifier<TicketState> {
   /// Check ticket status using the new endpoint
   Future<Map<String, dynamic>?> checkTicketStatus(String ticketId) async {
     try {
-      final response = await _apiService.get('${ApiConstants.ticketStatus}/$ticketId/status');
+      final response = await _apiService
+          .get('${ApiConstants.ticketStatus}/$ticketId/status');
       return response.data['data'];
     } catch (e) {
       state = state.copyWith(error: e.toString());
@@ -188,7 +194,8 @@ class TicketNotifier extends StateNotifier<TicketState> {
   /// Check if ticket is active using the new endpoint
   Future<bool> isTicketActive(String ticketId) async {
     try {
-      final response = await _apiService.get('${ApiConstants.ticketIsActive}/$ticketId/is-active');
+      final response = await _apiService
+          .get('${ApiConstants.ticketIsActive}/$ticketId/is-active');
       return response.data['data']['is_active'] ?? false;
     } catch (e) {
       state = state.copyWith(error: e.toString());
@@ -215,7 +222,8 @@ class TicketNotifier extends StateNotifier<TicketState> {
         'travel_date': travelDate.toIso8601String(),
       };
 
-      final response = await _apiService.post(ApiConstants.calculateFare, data: fareData);
+      final response =
+          await _apiService.post(ApiConstants.calculateFare, data: fareData);
       return response.data['data'];
     } catch (e) {
       state = state.copyWith(error: e.toString());

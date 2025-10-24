@@ -171,8 +171,7 @@ class _BusNumberEntryScreenState extends ConsumerState<BusNumberEntryScreen> {
 
               // Search button
               if (_isLoading)
-                const Center(
-                    child: CircularProgressIndicator())
+                const Center(child: CircularProgressIndicator())
               else
                 CustomButton(
                   onPressed: _handleBusNumberSubmit,

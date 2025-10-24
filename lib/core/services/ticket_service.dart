@@ -25,8 +25,7 @@ class TicketService {
 
   Future<List<TicketModel>> getUserTickets() async {
     try {
-      final response =
-          await ApiClient.get('/tickets/passenger/my-tickets');
+      final response = await ApiClient.get('/tickets/passenger/my-tickets');
       final List<dynamic> data = response.data['data'];
       return data.map((json) => TicketModel.fromJson(json)).toList();
     } on DioException catch (e) {
@@ -60,7 +59,7 @@ class TicketService {
           'timestamp': DateTime.now().millisecondsSinceEpoch,
         },
       );
-      
+
       if (response.data['success'] == true) {
         return TicketModel.fromJson(response.data['data']);
       }

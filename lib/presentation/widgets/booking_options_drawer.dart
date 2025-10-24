@@ -56,7 +56,7 @@ class BookingOptionsDrawer extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Booking Options
           Expanded(
             child: ListView(
@@ -72,9 +72,9 @@ class BookingOptionsDrawer extends StatelessWidget {
                     Navigator.pushNamed(context, '/qr-scanner');
                   },
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 _buildBookingOption(
                   context,
                   icon: Icons.qr_code,
@@ -85,9 +85,9 @@ class BookingOptionsDrawer extends StatelessWidget {
                     Navigator.pushNamed(context, '/qr-scanner');
                   },
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 _buildBookingOption(
                   context,
                   icon: Icons.edit,
@@ -98,13 +98,13 @@ class BookingOptionsDrawer extends StatelessWidget {
                     Navigator.pushNamed(context, '/booking');
                   },
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 const Divider(),
-                
+
                 const SizedBox(height: 12),
-                
+
                 // Additional Options
                 ListTile(
                   leading: const Icon(
@@ -118,7 +118,7 @@ class BookingOptionsDrawer extends StatelessWidget {
                     Navigator.pushNamed(context, '/ticket');
                   },
                 ),
-                
+
                 ListTile(
                   leading: const Icon(
                     Icons.history,
@@ -131,7 +131,7 @@ class BookingOptionsDrawer extends StatelessWidget {
                     Navigator.pushNamed(context, '/booking-history');
                   },
                 ),
-                
+
                 ListTile(
                   leading: const Icon(
                     Icons.help,

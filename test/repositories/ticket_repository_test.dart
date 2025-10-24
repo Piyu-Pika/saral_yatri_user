@@ -13,11 +13,7 @@ void main() {
           "total_subsidy_amount": 0,
           "net_fare": 50,
           "taxes": [
-            {
-              "tax_type": "Green Tax",
-              "tax_rate": 2,
-              "tax_amount": 1
-            }
+            {"tax_type": "Green Tax", "tax_rate": 2, "tax_amount": 1}
           ],
           "total_tax_amount": 1,
           "final_amount": 51,
@@ -32,7 +28,7 @@ void main() {
 
       // Verify the structure matches what FareBreakdownCard expects
       final fareData = mockApiResponse['data'] as Map<String, dynamic>;
-      
+
       expect(fareData['base_fare'], equals(50));
       expect(fareData['distance'], equals(10));
       expect(fareData['total_subsidy_amount'], equals(0));

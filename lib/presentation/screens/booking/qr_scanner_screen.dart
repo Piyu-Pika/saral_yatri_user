@@ -57,7 +57,8 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen> {
       if (QRService.validateQRCode(code)) {
         _handleValidQRCode(code);
       } else {
-        _showErrorDialog('Invalid QR Code', 'The scanned QR code is not valid.');
+        _showErrorDialog(
+            'Invalid QR Code', 'The scanned QR code is not valid.');
       }
     }
   }
@@ -123,8 +124,8 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: widget.scanType == QRScanType.bus 
-            ? 'Scan Bus QR Code' 
+        title: widget.scanType == QRScanType.bus
+            ? 'Scan Bus QR Code'
             : 'Scan Conductor QR Code',
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

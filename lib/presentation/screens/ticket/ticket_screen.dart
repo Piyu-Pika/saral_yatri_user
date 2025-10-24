@@ -46,7 +46,7 @@ class TicketCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isExpired = ticket.isExpired;
     final isActive = ticket.isActive;
-    
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
@@ -96,9 +96,9 @@ class TicketCard extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 8),
-              
+
               // Route Info
               Row(
                 children: [
@@ -118,9 +118,9 @@ class TicketCard extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 8),
-              
+
               // Fare and Time
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -161,7 +161,7 @@ class TicketDetailsModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isExpired = ticket.isExpired;
-    
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
       decoration: const BoxDecoration(
@@ -180,7 +180,7 @@ class TicketDetailsModal extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           // Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -201,7 +201,7 @@ class TicketDetailsModal extends StatelessWidget {
               ],
             ),
           ),
-          
+
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -214,7 +214,8 @@ class TicketDetailsModal extends StatelessWidget {
                       color: isExpired ? Colors.red[50] : Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isExpired ? AppTheme.errorColor : Colors.grey[300]!,
+                        color:
+                            isExpired ? AppTheme.errorColor : Colors.grey[300]!,
                       ),
                     ),
                     child: Column(
@@ -247,9 +248,9 @@ class TicketDetailsModal extends StatelessWidget {
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Ticket Information
                   _buildInfoCard([
                     _buildInfoRow('Ticket ID', ticket.id),
@@ -258,31 +259,41 @@ class TicketDetailsModal extends StatelessWidget {
                     _buildInfoRow('Boarding Stop', ticket.boardingStop),
                     _buildInfoRow('Drop Stop', ticket.droppingStop),
                   ]),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Fare Information
                   _buildInfoCard([
-                    _buildInfoRow('Original Fare', '₹${ticket.originalFare.toStringAsFixed(2)}'),
+                    _buildInfoRow('Original Fare',
+                        '₹${ticket.originalFare.toStringAsFixed(2)}'),
                     if (ticket.subsidyAmount > 0)
-                      _buildInfoRow('Subsidy', '-₹${ticket.subsidyAmount.toStringAsFixed(2)}', 
+                      _buildInfoRow('Subsidy',
+                          '-₹${ticket.subsidyAmount.toStringAsFixed(2)}',
                           valueColor: AppTheme.successColor),
-                    _buildInfoRow('Final Fare', '₹${ticket.finalFare.toStringAsFixed(2)}',
+                    _buildInfoRow(
+                        'Final Fare', '₹${ticket.finalFare.toStringAsFixed(2)}',
                         valueColor: AppTheme.primaryColor, isTotal: true),
-                    _buildInfoRow('Payment Method', ticket.paymentMethod.toUpperCase()),
+                    _buildInfoRow(
+                        'Payment Method', ticket.paymentMethod.toUpperCase()),
                   ]),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Time Information
                   _buildInfoCard([
-                    _buildInfoRow('Booking Time', 
-                        DateFormat('dd MMM yyyy, hh:mm a').format(ticket.bookingTime)),
-                    _buildInfoRow('Expiry Time', 
-                        DateFormat('dd MMM yyyy, hh:mm a').format(ticket.expiryTime)),
+                    _buildInfoRow(
+                        'Booking Time',
+                        DateFormat('dd MMM yyyy, hh:mm a')
+                            .format(ticket.bookingTime)),
+                    _buildInfoRow(
+                        'Expiry Time',
+                        DateFormat('dd MMM yyyy, hh:mm a')
+                            .format(ticket.expiryTime)),
                     if (ticket.verificationTime != null)
-                      _buildInfoRow('Verified At', 
-                          DateFormat('dd MMM yyyy, hh:mm a').format(ticket.verificationTime!)),
+                      _buildInfoRow(
+                          'Verified At',
+                          DateFormat('dd MMM yyyy, hh:mm a')
+                              .format(ticket.verificationTime!)),
                   ]),
                 ],
               ),
@@ -304,7 +315,8 @@ class TicketDetailsModal extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(String label, String value, {Color? valueColor, bool isTotal = false}) {
+  Widget _buildInfoRow(String label, String value,
+      {Color? valueColor, bool isTotal = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(

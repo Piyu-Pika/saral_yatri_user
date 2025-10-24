@@ -169,25 +169,21 @@ class _AboutScreenState extends State<AboutScreen> {
                           ),
                         ),
                         const SizedBox(height: 16),
-
                         _buildLinkItem(
                           'Privacy Policy',
                           'Learn how we protect your data',
                           () => _openLink('https://saralyatri.com/privacy'),
                         ),
-
                         _buildLinkItem(
                           'Terms of Service',
                           'Read our terms and conditions',
                           () => _openLink('https://saralyatri.com/terms'),
                         ),
-
                         _buildLinkItem(
                           'Open Source Licenses',
                           'View third-party licenses',
                           () => _showLicensesDialog(),
                         ),
-
                         _buildLinkItem(
                           'Rate This App',
                           'Help us improve by rating the app',
@@ -221,7 +217,6 @@ class _AboutScreenState extends State<AboutScreen> {
                           ),
                         ),
                         const SizedBox(height: 16),
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -458,7 +453,8 @@ class _AboutScreenState extends State<AboutScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(action),
-        content: Text('$action: $value\n\nThis feature requires url_launcher dependency.'),
+        content: Text(
+            '$action: $value\n\nThis feature requires url_launcher dependency.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -473,7 +469,8 @@ class _AboutScreenState extends State<AboutScreen> {
     showLicensePage(
       context: context,
       applicationName: 'SaralYatri',
-      applicationVersion: '1.0.0', // TODO: Use _packageInfo?.version when available
+      applicationVersion:
+          '1.0.0', // TODO: Use _packageInfo?.version when available
       applicationIcon: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
@@ -507,7 +504,8 @@ class _AboutScreenState extends State<AboutScreen> {
             onPressed: () {
               Navigator.of(context).pop();
               // Open app store rating page
-              _openLink('https://play.google.com/store/apps/details?id=com.saralyatri.app');
+              _openLink(
+                  'https://play.google.com/store/apps/details?id=com.saralyatri.app');
             },
             child: const Text('Rate Now'),
           ),

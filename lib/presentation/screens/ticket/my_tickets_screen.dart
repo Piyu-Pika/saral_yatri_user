@@ -173,8 +173,6 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen>
     );
   }
 
-
-
   Widget _buildEnhancedTicketList(
       List enhancedTickets, String emptyTitle, String emptySubtitle) {
     if (enhancedTickets.isEmpty) {
@@ -222,7 +220,7 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen>
         itemBuilder: (context, index) {
           final enhancedTicket = enhancedTickets[index];
           final ticket = enhancedTicket.ticket;
-          
+
           return EnhancedTicketListItemWidget(
             enhancedTicket: enhancedTicket,
             onTap: () {
@@ -231,12 +229,13 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen>
                   .read(presentation_provider.ticketProvider)
                   .currentEnhancedTicket;
 
-              if (currentEnhancedTicket != null && currentEnhancedTicket.id == ticket.id) {
+              if (currentEnhancedTicket != null &&
+                  currentEnhancedTicket.id == ticket.id) {
                 // Navigate to QR ticket screen for enhanced tickets
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => QrTicketScreen(
-                      ticket: currentEnhancedTicket,
+                      ticket: currentEnhancedTicket.toTicketModel(),
                       enhancedDisplay: enhancedTicket,
                     ),
                   ),

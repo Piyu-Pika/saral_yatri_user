@@ -184,7 +184,8 @@ class _SubsidyApplicationDetailScreenState
                 color: textColor.withValues(alpha: 0.9),
               ),
             ),
-            if (application.validFrom != null && application.validUntil != null) ...[
+            if (application.validFrom != null &&
+                application.validUntil != null) ...[
               const SizedBox(height: 8),
               Text(
                 'Valid: ${_formatDate(application.validFrom!)} - ${_formatDate(application.validUntil!)}',
@@ -248,11 +249,14 @@ class _SubsidyApplicationDetailScreenState
     return _buildInfoCard(
       'Income Information',
       [
-        _buildInfoRow('Monthly Income', '₹${income.monthlyIncome.toStringAsFixed(0)}'),
-        _buildInfoRow('Annual Income', '₹${income.annualIncome.toStringAsFixed(0)}'),
+        _buildInfoRow(
+            'Monthly Income', '₹${income.monthlyIncome.toStringAsFixed(0)}'),
+        _buildInfoRow(
+            'Annual Income', '₹${income.annualIncome.toStringAsFixed(0)}'),
         _buildInfoRow('Income Source', income.incomeSource),
         _buildInfoRow('Family Members', income.familyMembers.toString()),
-        _buildInfoRow('Family Income', '₹${income.familyIncome.toStringAsFixed(0)}'),
+        _buildInfoRow(
+            'Family Income', '₹${income.familyIncome.toStringAsFixed(0)}'),
       ],
     );
   }

@@ -27,7 +27,8 @@ class TicketUtils {
   }
 
   /// Check if a ticket ID matches an enhanced ticket
-  static bool isEnhancedTicket(String ticketId, EnhancedTicketModel? enhancedTicket) {
+  static bool isEnhancedTicket(
+      String ticketId, EnhancedTicketModel? enhancedTicket) {
     return enhancedTicket != null && enhancedTicket.id == ticketId;
   }
 

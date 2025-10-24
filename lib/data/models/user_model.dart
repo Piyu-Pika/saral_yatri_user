@@ -45,8 +45,10 @@ class UserModel {
       profileImage: json['profile_image']?.toString(),
       isVerified: json['is_verified'] == true || json['is_verified'] == 1,
       isActive: json['is_active'] == true || json['is_active'] == 1,
-      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(json['updated_at']?.toString() ?? '') ?? DateTime.now(),
+      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ??
+          DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
+          DateTime.now(),
       dateOfBirth: safeParseDateTime(json['date_of_birth']?.toString()),
       subsidyEligible: (json['subsidy_eligible'] as List<dynamic>?)
           ?.map((e) => e.toString())

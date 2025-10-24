@@ -20,7 +20,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
   final _emergencyContactController = TextEditingController();
-  
+
   bool _isLoading = false;
 
   @override
@@ -214,7 +214,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
               // Cancel button
               TextButton(
-                onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
+                onPressed:
+                    _isLoading ? null : () => Navigator.of(context).pop(),
                 child: const Text(
                   'Cancel',
                   style: TextStyle(

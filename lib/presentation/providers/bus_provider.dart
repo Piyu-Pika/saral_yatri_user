@@ -50,7 +50,7 @@ class BusNotifier extends StateNotifier<BusState> {
 
   Future<void> loadAllBuses() async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final buses = await _busRepository.getAllBuses();
       state = state.copyWith(
@@ -68,7 +68,7 @@ class BusNotifier extends StateNotifier<BusState> {
 
   Future<void> loadNearbyBuses(double latitude, double longitude) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final buses = await _busRepository.getNearbyBuses(latitude, longitude);
       state = state.copyWith(
@@ -95,7 +95,7 @@ class BusNotifier extends StateNotifier<BusState> {
 
   Future<BusModel?> getBusByQrCode(String qrCode) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final bus = await _busRepository.getBusByQrCode(qrCode);
       state = state.copyWith(
@@ -115,7 +115,7 @@ class BusNotifier extends StateNotifier<BusState> {
 
   Future<BusModel?> getBusByNumber(String busNumber) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final bus = await _busRepository.getBusByNumber(busNumber);
       state = state.copyWith(

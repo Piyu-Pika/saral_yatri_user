@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:screen_protector/screen_protector.dart';
+import 'package:qr/qr.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/ticket_model.dart';
-import '../../../data/models/enhanced_ticket_model.dart';
 import '../../../data/models/enhanced_ticket_display_model.dart';
-import '../../../core/services/mock_ticket_service.dart';
 import '../../../core/services/data_resolution_service.dart';
 import '../../widgets/common/custom_app_bar.dart';
 import '../../widgets/ticket/ticket_card.dart';
-import '../../widgets/ticket/qr_display.dart';
 import 'qr_ticket_screen.dart';
 
 class TicketDetailScreen extends ConsumerStatefulWidget {
@@ -36,7 +34,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
     if (widget.ticket.isActive) {
       _enableScreenProtection();
     }
-    
+
     // If we don't have enhanced ticket data, try to resolve names
     if (widget.enhancedTicket == null) {
       _resolveTicketNames();
@@ -70,14 +68,11 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
   }
 
   void _showEnhancedQRTicket() {
-    // Convert regular ticket to enhanced ticket for QR display
-    final enhancedTicket = _convertToEnhancedTicket(widget.ticket);
-    
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => QrTicketScreen(
-          ticket: enhancedTicket,
+          ticket: widget.ticket,
           enhancedDisplay: _resolvedTicket,
         ),
       ),
@@ -85,7 +80,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
   }
 
   Future<void> _resolveTicketNames() async {
-    if (widget.ticket.boardingStationId == null || 
+    if (widget.ticket.boardingStationId == null ||
         widget.ticket.destinationStationId == null) {
       // Create enhanced ticket from existing data if no station IDs
       _resolvedTicket = EnhancedTicketDisplayModel.fromTicket(widget.ticket);
@@ -122,19 +117,6 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
     }
   }
 
-  EnhancedTicketModel _convertToEnhancedTicket(TicketModel ticket) {
-    // Create enhanced ticket from regular ticket data
-    return MockTicketService.createMockEnhancedTicket(
-      busId: ticket.busId,
-      routeId: ticket.routeId,
-      boardingStationId: ticket.boardingStationId ?? ticket.boardingStop,
-      destinationStationId: ticket.destinationStationId ?? ticket.droppingStop,
-      paymentMethod: ticket.paymentMethod,
-      ticketType: ticket.ticketType ?? 'single',
-      travelDate: ticket.travelDate ?? ticket.bookingTime,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -169,7 +151,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
-              color: widget.ticket.isActive 
+              color: widget.ticket.isActive
                   ? AppColors.success.withValues(alpha: 0.1)
                   : AppColors.error.withValues(alpha: 0.1),
               child: Row(
@@ -177,14 +159,18 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                 children: [
                   Icon(
                     widget.ticket.isActive ? Icons.check_circle : Icons.error,
-                    color: widget.ticket.isActive ? AppColors.success : AppColors.error,
+                    color: widget.ticket.isActive
+                        ? AppColors.success
+                        : AppColors.error,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     widget.ticket.isActive ? 'ACTIVE TICKET' : 'EXPIRED TICKET',
                     style: TextStyle(
-                      color: widget.ticket.isActive ? AppColors.success : AppColors.error,
+                      color: widget.ticket.isActive
+                          ? AppColors.success
+                          : AppColors.error,
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                     ),
@@ -207,7 +193,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
 
                   // QR code (only for active tickets)
                   if (widget.ticket.isActive) ...[
-                    QRDisplayWidget(ticket: widget.ticket),
+                    _buildQRCodeSection(),
                     const SizedBox(height: 16),
                   ],
 
@@ -233,8 +219,9 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
   }
 
   Widget _buildJourneyDetails() {
-    final displayTicket = _resolvedTicket ?? EnhancedTicketDisplayModel.fromTicket(widget.ticket);
-    
+    final displayTicket =
+        _resolvedTicket ?? EnhancedTicketDisplayModel.fromTicket(widget.ticket);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -270,17 +257,18 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
             ),
             const SizedBox(height: 12),
             _buildDetailRow('Bus Number', displayTicket.busNumber),
-            if (displayTicket.isDataResolved && 
-                displayTicket.routeName.isNotEmpty && 
+            if (displayTicket.isDataResolved &&
+                displayTicket.routeName.isNotEmpty &&
                 !displayTicket.routeName.startsWith('Route'))
               _buildDetailRow('Route', displayTicket.routeName),
             _buildDetailRow('From', displayTicket.boardingStationName),
             _buildDetailRow('To', displayTicket.destinationStationName),
-            _buildDetailRow('Travel Date', 
-              '${widget.ticket.bookingTime.day}/${widget.ticket.bookingTime.month}/${widget.ticket.bookingTime.year}'),
-            _buildDetailRow('Valid Until', 
-              '${widget.ticket.expiryTime.day}/${widget.ticket.expiryTime.month}/${widget.ticket.expiryTime.year} '
-              '${widget.ticket.expiryTime.hour}:${widget.ticket.expiryTime.minute.toString().padLeft(2, '0')}'),
+            _buildDetailRow('Travel Date',
+                '${widget.ticket.bookingTime.day}/${widget.ticket.bookingTime.month}/${widget.ticket.bookingTime.year}'),
+            _buildDetailRow(
+                'Valid Until',
+                '${widget.ticket.expiryTime.day}/${widget.ticket.expiryTime.month}/${widget.ticket.expiryTime.year} '
+                    '${widget.ticket.expiryTime.hour}:${widget.ticket.expiryTime.minute.toString().padLeft(2, '0')}'),
             if (widget.ticket.ticketNumber != null)
               _buildDetailRow('Ticket Number', widget.ticket.ticketNumber!),
           ],
@@ -305,15 +293,19 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            _buildDetailRow('Original Fare', '₹${widget.ticket.originalFare.toStringAsFixed(2)}'),
+            _buildDetailRow('Original Fare',
+                '₹${widget.ticket.originalFare.toStringAsFixed(2)}'),
             if (widget.ticket.subsidyAmount > 0)
-              _buildDetailRow('Subsidy Amount', '-₹${widget.ticket.subsidyAmount.toStringAsFixed(2)}',
-                color: AppColors.success),
+              _buildDetailRow('Subsidy Amount',
+                  '-₹${widget.ticket.subsidyAmount.toStringAsFixed(2)}',
+                  color: AppColors.success),
             if (widget.ticket.taxAmount != null && widget.ticket.taxAmount! > 0)
-              _buildDetailRow('Tax Amount', '₹${widget.ticket.taxAmount!.toStringAsFixed(2)}'),
+              _buildDetailRow('Tax Amount',
+                  '₹${widget.ticket.taxAmount!.toStringAsFixed(2)}'),
             const Divider(),
-            _buildDetailRow('Final Amount', '₹${widget.ticket.finalFare.toStringAsFixed(2)}', 
-              isTotal: true),
+            _buildDetailRow('Final Amount',
+                '₹${widget.ticket.finalFare.toStringAsFixed(2)}',
+                isTotal: true),
           ],
         ),
       ),
@@ -339,21 +331,208 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
             _buildDetailRow('Ticket ID', widget.ticket.id),
             if (widget.ticket.ticketNumber != null)
               _buildDetailRow('Ticket Number', widget.ticket.ticketNumber!),
-            _buildDetailRow('Booking Time', 
-              '${widget.ticket.bookingTime.day}/${widget.ticket.bookingTime.month}/${widget.ticket.bookingTime.year} '
-              '${widget.ticket.bookingTime.hour}:${widget.ticket.bookingTime.minute.toString().padLeft(2, '0')}'),
-            _buildDetailRow('Payment Method', widget.ticket.paymentMethod.toUpperCase()),
+            _buildDetailRow(
+                'Booking Time',
+                '${widget.ticket.bookingTime.day}/${widget.ticket.bookingTime.month}/${widget.ticket.bookingTime.year} '
+                    '${widget.ticket.bookingTime.hour}:${widget.ticket.bookingTime.minute.toString().padLeft(2, '0')}'),
+            _buildDetailRow(
+                'Payment Method', widget.ticket.paymentMethod.toUpperCase()),
             if (widget.ticket.transactionId != null)
               _buildDetailRow('Transaction ID', widget.ticket.transactionId!),
             _buildDetailRow('Status', widget.ticket.status.toUpperCase(),
-              color: widget.ticket.isActive ? AppColors.success : AppColors.error),
+                color: widget.ticket.isActive
+                    ? AppColors.success
+                    : AppColors.error),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value, {bool isTotal = false, Color? color}) {
+  Widget _buildQRCodeSection() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: widget.ticket.isExpired ? AppColors.error : AppColors.primary,
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color:
+                (widget.ticket.isExpired ? AppColors.error : AppColors.primary)
+                    .withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // QR Code header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.qr_code,
+                color: widget.ticket.isExpired
+                    ? AppColors.error
+                    : AppColors.primary,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Show this QR to Conductor',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: widget.ticket.isExpired
+                      ? AppColors.error
+                      : AppColors.primary,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // QR Code display using actual API data
+          Container(
+            width: 200,
+            height: 200,
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                if ((widget.ticket.encryptedToken?.isNotEmpty ?? false) &&
+                    !widget.ticket.isExpired)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: _buildQRCodeFromData(widget.ticket.encryptedToken!),
+                  )
+                else if (widget.ticket.qrCode.isNotEmpty &&
+                    !widget.ticket.isExpired)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: _buildQRCodeFromData(widget.ticket.qrCode),
+                  )
+                else
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        widget.ticket.isExpired
+                            ? Icons.error
+                            : Icons.error_outline,
+                        size: 48,
+                        color: widget.ticket.isExpired
+                            ? AppColors.error
+                            : AppColors.textSecondary,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        widget.ticket.isExpired
+                            ? 'QR CODE EXPIRED'
+                            : 'QR CODE ERROR',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: widget.ticket.isExpired
+                              ? AppColors.error
+                              : AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                // Expired overlay
+                if (widget.ticket.isExpired)
+                  Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: AppColors.error.withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.block,
+                            size: 48,
+                            color: Colors.white,
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'EXPIRED',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Ticket status
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: widget.ticket.isExpired
+                  ? AppColors.error.withValues(alpha: 0.1)
+                  : AppColors.success.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: widget.ticket.isExpired
+                    ? AppColors.error.withValues(alpha: 0.3)
+                    : AppColors.success.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Text(
+              widget.ticket.isExpired ? 'EXPIRED' : 'VALID TICKET',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: widget.ticket.isExpired
+                    ? AppColors.error
+                    : AppColors.success,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQRCodeFromData(String qrData) {
+    // Use the actual QR data from the API
+    return Container(
+      width: 180,
+      height: 180,
+      child: CustomPaint(
+        size: const Size(180, 180),
+        painter: _QRCodePainter(data: qrData),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value,
+      {bool isTotal = false, Color? color}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -367,16 +546,83 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
               color: AppColors.textSecondary,
             ),
           ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: isTotal ? 16 : 14,
-              fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
-              color: color ?? (isTotal ? AppColors.primary : AppColors.textPrimary),
+          Flexible(
+            child: Text(
+              value,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              softWrap: false,
+              style: TextStyle(
+                fontSize: isTotal ? 16 : 14,
+                fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
+                color: color ??
+                    (isTotal ? AppColors.primary : AppColors.textPrimary),
+              ),
             ),
           ),
         ],
       ),
     );
   }
+}
+
+class _QRCodePainter extends CustomPainter {
+  final String data;
+
+  _QRCodePainter({required this.data});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    try {
+      final qrCode = QrCode.fromData(
+        data: data,
+        errorCorrectLevel: QrErrorCorrectLevel.M,
+      );
+
+      final qrImage = QrImage(qrCode);
+      final pixelSize = size.width / qrImage.moduleCount;
+
+      final paint = Paint()
+        ..color = Colors.black
+        ..style = PaintingStyle.fill;
+
+      for (int x = 0; x < qrImage.moduleCount; x++) {
+        for (int y = 0; y < qrImage.moduleCount; y++) {
+          if (qrImage.isDark(y, x)) {
+            final rect = Rect.fromLTWH(
+              x * pixelSize,
+              y * pixelSize,
+              pixelSize,
+              pixelSize,
+            );
+            canvas.drawRect(rect, paint);
+          }
+        }
+      }
+    } catch (e) {
+      // Fallback: draw error message
+      final textPainter = TextPainter(
+        text: const TextSpan(
+          text: 'QR ERROR',
+          style: TextStyle(
+            color: Colors.red,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout();
+      textPainter.paint(
+        canvas,
+        Offset(
+          (size.width - textPainter.width) / 2,
+          (size.height - textPainter.height) / 2,
+        ),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

@@ -13,7 +13,8 @@ class FareBreakdownCard extends StatelessWidget {
   Widget build(BuildContext context) {
     // Handle new API response structure
     final baseFare = (fareData['base_fare'] ?? 0.0).toDouble();
-    final totalSubsidyAmount = (fareData['total_subsidy_amount'] ?? 0.0).toDouble();
+    final totalSubsidyAmount =
+        (fareData['total_subsidy_amount'] ?? 0.0).toDouble();
     final totalTaxAmount = (fareData['total_tax_amount'] ?? 0.0).toDouble();
     final finalAmount = (fareData['final_amount'] ?? 0.0).toDouble();
     final governmentShare = (fareData['government_share'] ?? 0.0).toDouble();
@@ -21,7 +22,8 @@ class FareBreakdownCard extends StatelessWidget {
     final distance = (fareData['distance'] ?? 0.0).toDouble();
     final busType = fareData['bus_type'] as String?;
     final routeType = fareData['route_type'] as String?;
-    final appliedSubsidies = fareData['applied_subsidies'] as List<dynamic>? ?? [];
+    final appliedSubsidies =
+        fareData['applied_subsidies'] as List<dynamic>? ?? [];
     final taxes = fareData['taxes'] as List<dynamic>? ?? [];
 
     return Card(
@@ -38,7 +40,7 @@ class FareBreakdownCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Trip Info
             if (distance > 0)
               _buildFareRow(
@@ -46,29 +48,29 @@ class FareBreakdownCard extends StatelessWidget {
                 '${distance.toStringAsFixed(1)} km',
                 isInfo: true,
               ),
-            
+
             if (busType != null)
               _buildFareRow(
                 'Bus Type',
                 busType.toUpperCase(),
                 isInfo: true,
               ),
-            
+
             if (routeType != null)
               _buildFareRow(
                 'Route Type',
                 routeType.toUpperCase(),
                 isInfo: true,
               ),
-            
+
             const SizedBox(height: 8),
-            
+
             // Base Fare
             _buildFareRow(
               'Base Fare',
               '₹${baseFare.toStringAsFixed(2)}',
             ),
-            
+
             // Applied Subsidies
             if (appliedSubsidies.isNotEmpty) ...[
               for (var subsidy in appliedSubsidies)
@@ -78,7 +80,7 @@ class FareBreakdownCard extends StatelessWidget {
                   valueColor: AppTheme.successColor,
                 ),
             ],
-            
+
             // Taxes
             if (taxes.isNotEmpty) ...[
               for (var tax in taxes)
@@ -88,17 +90,17 @@ class FareBreakdownCard extends StatelessWidget {
                   valueColor: AppTheme.errorColor,
                 ),
             ],
-            
+
             if (totalSubsidyAmount > 0 || totalTaxAmount > 0)
               const Divider(height: 24),
-            
+
             // Final Amount
             _buildFareRow(
               'Total Amount',
               '₹${finalAmount.toStringAsFixed(2)}',
               isTotal: true,
             ),
-            
+
             // Government Share Info
             if (totalSubsidyAmount > 0) ...[
               const SizedBox(height: 12),
@@ -179,7 +181,8 @@ class FareBreakdownCard extends StatelessWidget {
             style: TextStyle(
               fontSize: isTotal ? 18 : 14,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
-              color: valueColor ?? (isTotal ? AppTheme.primaryColor : AppTheme.textPrimary),
+              color: valueColor ??
+                  (isTotal ? AppTheme.primaryColor : AppTheme.textPrimary),
             ),
           ),
         ],

@@ -342,7 +342,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             Text('From: ${_selectedBoardingStation!.name}'),
             Text('To: ${_selectedDropStation!.name}'),
             Text('Ticket Type: ${_selectedTicketType.toUpperCase()}'),
-            Text('Payment Method: ${_getPaymentMethodDisplayName(_selectedPaymentMethod)}'),
+            Text(
+                'Payment Method: ${_getPaymentMethodDisplayName(_selectedPaymentMethod)}'),
             const SizedBox(height: 8),
             Text(
               'Total Amount: ₹${finalAmount.toStringAsFixed(2)}',
@@ -365,20 +366,21 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         ],
       ),
     );
-    
+
     if (confirmed != true) return;
 
     // Book the ticket using the enhanced booking method
     try {
-      final success = await ref.read(ticketProvider.notifier).bookEnhancedTicket(
-        busId: _selectedBus!.id,
-        routeId: _selectedBus!.routeId,
-        boardingStationId: _selectedBoardingStation!.id,
-        droppingStationId: _selectedDropStation!.id,
-        paymentMethod: _selectedPaymentMethod,
-        ticketType: _selectedTicketType,
-        travelDate: DateTime.now(),
-      );
+      final success =
+          await ref.read(ticketProvider.notifier).bookEnhancedTicket(
+                busId: _selectedBus!.id,
+                routeId: _selectedBus!.routeId,
+                boardingStationId: _selectedBoardingStation!.id,
+                droppingStationId: _selectedDropStation!.id,
+                paymentMethod: _selectedPaymentMethod,
+                ticketType: _selectedTicketType,
+                travelDate: DateTime.now(),
+              );
 
       if (success) {
         // Show success message
@@ -1194,7 +1196,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            (busState.error ?? ticketState.error ?? '').toString(),
+                            (busState.error ?? ticketState.error ?? '')
+                                .toString(),
                             style: const TextStyle(
                               color: AppTheme.errorColor,
                               fontSize: 14,
@@ -1203,10 +1206,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         ),
                       ],
                     ),
-                    
+
                     // Show server status if it's a server issue
-                    if ((busState.error ?? ticketState.error ?? '').contains('Server is temporarily unavailable') ||
-                        (busState.error ?? ticketState.error ?? '').contains('maintenance')) ...[
+                    if ((busState.error ?? ticketState.error ?? '')
+                            .contains('Server is temporarily unavailable') ||
+                        (busState.error ?? ticketState.error ?? '')
+                            .contains('maintenance')) ...[
                       const SizedBox(height: 12),
                       Container(
                         padding: const EdgeInsets.all(8),

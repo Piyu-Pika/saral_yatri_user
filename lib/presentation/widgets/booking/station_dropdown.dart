@@ -93,7 +93,7 @@ class _StationDropdownState extends ConsumerState<StationDropdown> {
   @override
   Widget build(BuildContext context) {
     final stationState = ref.watch(stationProvider);
-    
+
     // Update filtered stations when stations change
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (stationState.stations.isNotEmpty) {
@@ -209,10 +209,12 @@ class _StationDropdownState extends ConsumerState<StationDropdown> {
                                 onChanged: _filterStations,
                                 decoration: InputDecoration(
                                   hintText: 'Search stations...',
-                                  prefixIcon: const Icon(Icons.search, size: 20),
+                                  prefixIcon:
+                                      const Icon(Icons.search, size: 20),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(color: Colors.grey[300]!),
+                                    borderSide:
+                                        BorderSide(color: Colors.grey[300]!),
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 12,

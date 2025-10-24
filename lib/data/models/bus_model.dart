@@ -16,14 +16,14 @@ class BusModel {
   final String qrCode;
   final DateTime lastUpdated;
   final String currentStatus;
-  
+
   // Vehicle specifications
   final int seatingCapacity;
   final bool hasAirConditioning;
   final bool hasWifi;
   final bool hasGps;
   final bool isAccessible;
-  
+
   // Vehicle compliance
   final String emissionStandard;
   final DateTime? fitnessExpiryDate;
@@ -60,7 +60,7 @@ class BusModel {
   factory BusModel.fromJson(Map<String, dynamic> json) {
     final specs = json['specifications'] ?? {};
     final compliance = json['vehicle_compliance'] ?? {};
-    
+
     return BusModel(
       id: json['id'] ?? '',
       busNumber: json['bus_number'] ?? '',
@@ -78,7 +78,9 @@ class BusModel {
       availableSeats: json['available_seats'] ?? specs['seating_capacity'] ?? 0,
       isActive: json['is_active'] ?? false,
       qrCode: json['qr_code'] ?? '',
-      lastUpdated: DateTime.parse(json['updated_at'] ?? json['last_updated'] ?? DateTime.now().toIso8601String()),
+      lastUpdated: DateTime.parse(json['updated_at'] ??
+          json['last_updated'] ??
+          DateTime.now().toIso8601String()),
       currentStatus: json['current_status'] ?? 'unknown',
       seatingCapacity: specs['seating_capacity'] ?? 0,
       hasAirConditioning: specs['has_air_conditioning'] ?? false,
@@ -86,10 +88,12 @@ class BusModel {
       hasGps: specs['has_gps'] ?? false,
       isAccessible: specs['is_accessible'] ?? false,
       emissionStandard: compliance['emission_standard'] ?? '',
-      fitnessExpiryDate: compliance['fitness_expiry_date'] != null && compliance['fitness_expiry_date'] != "0001-01-01T00:00:00Z" 
-          ? DateTime.tryParse(compliance['fitness_expiry_date']) 
+      fitnessExpiryDate: compliance['fitness_expiry_date'] != null &&
+              compliance['fitness_expiry_date'] != "0001-01-01T00:00:00Z"
+          ? DateTime.tryParse(compliance['fitness_expiry_date'])
           : null,
-      insuranceExpiryDate: compliance['insurance_expiry_date'] != null && compliance['insurance_expiry_date'] != "0001-01-01T00:00:00Z"
+      insuranceExpiryDate: compliance['insurance_expiry_date'] != null &&
+              compliance['insurance_expiry_date'] != "0001-01-01T00:00:00Z"
           ? DateTime.tryParse(compliance['insurance_expiry_date'])
           : null,
       isCompliant: compliance['is_compliant'] ?? false,

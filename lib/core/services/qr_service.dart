@@ -180,7 +180,7 @@ class QRService {
 
       final busId = qrData.substring(4); // Remove 'BUS_' prefix
       AppLogger.info('Parsed bus QR - Bus ID: $busId');
-      
+
       return {
         'type': 'bus',
         'bus_id': busId,
@@ -231,7 +231,7 @@ class QRService {
   static Map<String, dynamic>? parseQRData(String qrData) {
     try {
       AppLogger.info('Parsing QR data: $qrData');
-      
+
       if (qrData.startsWith('BUS_')) {
         AppLogger.info('Detected bus QR code');
         return parseBusQRData(qrData);

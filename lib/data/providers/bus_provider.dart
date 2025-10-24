@@ -140,10 +140,10 @@ class BusNotifier extends StateNotifier<BusState> {
       if (response.data['data'] != null) {
         final bus = BusModel.fromJson(response.data['data']);
         state = state.copyWith(selectedBus: bus);
-        
+
         // Load route stations for the selected bus
         await loadRouteStations(bus.routeId);
-        
+
         return bus;
       }
       return null;
@@ -163,7 +163,7 @@ class BusNotifier extends StateNotifier<BusState> {
 
     try {
       AppLogger.info('Loading stations for route: $routeId');
-      
+
       final response = await _apiService.get(
         '${ApiConstants.routeActiveStations}/$routeId/stations/active',
       );
@@ -173,13 +173,14 @@ class BusNotifier extends StateNotifier<BusState> {
       if (response.data['data'] != null) {
         final stationsData = response.data['data'] as List;
         AppLogger.info('Raw stations data: $stationsData');
-        
+
         final stations = <StationModel>[];
         for (var data in stationsData) {
           try {
             final station = StationModel.fromJson(data);
             stations.add(station);
-            AppLogger.info('Parsed station: ID=${station.id}, Name="${station.name}", Code="${station.code}", Route="${station.routeId}"');
+            AppLogger.info(
+                'Parsed station: ID=${station.id}, Name="${station.name}", Code="${station.code}", Route="${station.routeId}"');
           } catch (e) {
             AppLogger.error('Failed to parse station data: $data, Error: $e');
           }
@@ -188,14 +189,16 @@ class BusNotifier extends StateNotifier<BusState> {
         // Sort stations by sequence
         stations.sort((a, b) => a.sequence.compareTo(b.sequence));
 
-        AppLogger.info('Successfully loaded ${stations.length} stations for route $routeId');
+        AppLogger.info(
+            'Successfully loaded ${stations.length} stations for route $routeId');
 
         state = state.copyWith(
           routeStations: stations,
           isLoadingStations: false,
         );
       } else {
-        AppLogger.warning('No stations data found for route $routeId. Response: ${response.data}');
+        AppLogger.warning(
+            'No stations data found for route $routeId. Response: ${response.data}');
         state = state.copyWith(
           routeStations: [],
           isLoadingStations: false,
@@ -219,10 +222,10 @@ class BusNotifier extends StateNotifier<BusState> {
       if (response.data['data'] != null) {
         final bus = BusModel.fromJson(response.data['data']);
         state = state.copyWith(selectedBus: bus);
-        
+
         // Load route stations for the selected bus
         await loadRouteStations(bus.routeId);
-        
+
         return bus;
       }
       return null;
@@ -245,7 +248,8 @@ class BusNotifier extends StateNotifier<BusState> {
 
   // Placeholder for nearby buses - can be implemented later
   Future<void> loadNearbyBuses(double latitude, double longitude) async {
-    AppLogger.info('loadNearbyBuses called for location: $latitude, $longitude');
+    AppLogger.info(
+        'loadNearbyBuses called for location: $latitude, $longitude');
     // TODO: Implement nearby buses loading if needed
     // For now, just load all active buses
     await loadActiveBuses();

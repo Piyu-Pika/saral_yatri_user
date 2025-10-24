@@ -29,7 +29,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       duration: const Duration(seconds: 2),
       vsync: this,
     );
-    
+
     _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
@@ -37,31 +37,31 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       parent: _animationController,
       curve: Curves.easeInOut,
     ));
-    
+
     _animationController.forward();
   }
 
   Future<void> _initializeApp() async {
     // Initialize storage
     await StorageService.init();
-    
+
     // Wait for splash animation
     await Future.delayed(const Duration(seconds: 3));
-    
+
     // Check authentication status
-  // Check authentication status using Riverpod
-  final authNotifier = ref.read(authProvider.notifier);
-  await authNotifier.checkAuthStatus();
+    // Check authentication status using Riverpod
+    final authNotifier = ref.read(authProvider.notifier);
+    await authNotifier.checkAuthStatus();
 
-  final authState = ref.read(authProvider);
+    final authState = ref.read(authProvider);
 
-  if (mounted) {
-    if (authState.isLoggedIn) {
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      Navigator.pushReplacementNamed(context, '/login');
+    if (mounted) {
+      if (authState.isLoggedIn) {
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
     }
-  }
   }
 
   @override
@@ -82,25 +82,22 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             children: [
               // App Logo
               Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Image.asset(
-                  'assets/images/icon.png'
-                )
-              ),
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Image.asset('assets/images/icon.png')),
               const SizedBox(height: 24),
-              
+
               // App Name
               const Text(
                 'Saral Yatri',
@@ -111,7 +108,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 ),
               ),
               const SizedBox(height: 8),
-              
+
               // Tagline
               const Text(
                 'Digital Bus Ticketing Solution',
@@ -121,7 +118,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 ),
               ),
               const SizedBox(height: 48),
-              
+
               // Loading Indicator
               const CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),

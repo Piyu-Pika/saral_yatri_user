@@ -189,33 +189,30 @@ class HelpSupportScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 16),
-
                         _buildContactItem(
                           Icons.phone,
                           'Phone',
                           '+91-1800-123-4567',
                           () => _makePhoneCall('+91-1800-123-4567'),
                         ),
-
                         _buildContactItem(
                           Icons.email,
                           'Email',
                           'support@saralyatri.com',
                           () => _sendEmail('support@saralyatri.com'),
                         ),
-
                         _buildContactItem(
                           Icons.language,
                           'Website',
                           'www.saralyatri.com',
                           () => _openWebsite('https://www.saralyatri.com'),
                         ),
-
                         _buildContactItem(
                           Icons.location_on,
                           'Address',
                           'Transport Bhawan, New Delhi - 110001',
-                          () => _copyToClipboard(context, 'Transport Bhawan, New Delhi - 110001'),
+                          () => _copyToClipboard(
+                              context, 'Transport Bhawan, New Delhi - 110001'),
                         ),
                       ],
                     ),
@@ -369,21 +366,24 @@ class HelpSupportScreen extends StatelessWidget {
     // TODO: Add url_launcher dependency and uncomment
     // final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
     // await launchUrl(launchUri);
-    _showFeatureDialog('Phone Call', 'This feature requires url_launcher dependency');
+    _showFeatureDialog(
+        'Phone Call', 'This feature requires url_launcher dependency');
   }
 
   Future<void> _sendEmail(String email) async {
     // TODO: Add url_launcher dependency and uncomment
     // final Uri launchUri = Uri(scheme: 'mailto', path: email, query: 'subject=SaralYatri Support Request');
     // await launchUrl(launchUri);
-    _showFeatureDialog('Email', 'This feature requires url_launcher dependency');
+    _showFeatureDialog(
+        'Email', 'This feature requires url_launcher dependency');
   }
 
   Future<void> _openWebsite(String url) async {
     // TODO: Add url_launcher dependency and uncomment
     // final Uri launchUri = Uri.parse(url);
     // await launchUrl(launchUri);
-    _showFeatureDialog('Website', 'This feature requires url_launcher dependency');
+    _showFeatureDialog(
+        'Website', 'This feature requires url_launcher dependency');
   }
 
   void _showFeatureDialog(String feature, String message) {

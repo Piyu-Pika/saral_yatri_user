@@ -142,7 +142,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           ),
 
           // Loading overlay
-          if (locationState.isLoading || busState.isLoading || stationState.isLoading)
+          if (locationState.isLoading ||
+              busState.isLoading ||
+              stationState.isLoading)
             Container(
               color: Colors.black26,
               child: const Center(child: CircularProgressIndicator()),

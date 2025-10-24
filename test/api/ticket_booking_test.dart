@@ -25,7 +25,8 @@ void main() {
       expect(requestData['bus_id'], equals(busId));
       expect(requestData['route_id'], equals(routeId));
       expect(requestData['boarding_station_id'], equals(boardingStationId));
-      expect(requestData['destination_station_id'], equals(destinationStationId));
+      expect(
+          requestData['destination_station_id'], equals(destinationStationId));
       expect(requestData['ticket_type'], equals(ticketType));
       expect(requestData['payment_mode'], equals(paymentMode));
       expect(requestData['travel_date'], equals("2024-10-06T10:00:00.000Z"));
@@ -62,7 +63,7 @@ void main() {
           default:
             apiPaymentMode = 'upi';
         }
-        
+
         expect(apiPaymentMode, equals(expected));
       });
     });
@@ -70,8 +71,12 @@ void main() {
     test('should handle expected response structures', () {
       // Test different possible response structures
       final responses = [
-        {'data': {'id': 'ticket123', 'status': 'confirmed'}},
-        {'ticket': {'id': 'ticket123', 'status': 'confirmed'}},
+        {
+          'data': {'id': 'ticket123', 'status': 'confirmed'}
+        },
+        {
+          'ticket': {'id': 'ticket123', 'status': 'confirmed'}
+        },
         {'id': 'ticket123', 'status': 'confirmed'},
       ];
 

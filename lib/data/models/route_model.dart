@@ -50,8 +50,9 @@ class Route {
       startStationId: json['start_station_id'] ?? '',
       endStationId: json['end_station_id'] ?? '',
       stations: (json['stations'] as List<dynamic>?)
-          ?.map((e) => RouteStation.fromJson(e))
-          .toList() ?? [],
+              ?.map((e) => RouteStation.fromJson(e))
+              .toList() ??
+          [],
       distance: (json['distance'] ?? 0).toDouble(),
       estimatedDuration: json['estimated_duration'] ?? 0,
       operatingHours: OperatingHours.fromJson(json['operating_hours'] ?? {}),
@@ -62,21 +63,29 @@ class Route {
       updatedAt: DateTime.tryParse(json['updated_at'] ?? '') ?? DateTime.now(),
       routePermit: RoutePermit.fromJson(json['route_permit'] ?? {}),
       fareStructure: (json['fare_structure'] as List<dynamic>?)
-          ?.map((e) => FareSegment.fromJson(e))
-          .toList() ?? [],
+              ?.map((e) => FareSegment.fromJson(e))
+              .toList() ??
+          [],
       safetyMeasures: SafetyMeasures.fromJson(json['safety_measures'] ?? {}),
     );
   }
 
   static RouteType _parseRouteType(String? type) {
     switch (type) {
-      case 'city': return RouteType.city;
-      case 'intercity': return RouteType.intercity;
-      case 'express': return RouteType.express;
-      case 'local': return RouteType.local;
-      case 'shuttle': return RouteType.shuttle;
-      case 'special': return RouteType.special;
-      default: return RouteType.local;
+      case 'city':
+        return RouteType.city;
+      case 'intercity':
+        return RouteType.intercity;
+      case 'express':
+        return RouteType.express;
+      case 'local':
+        return RouteType.local;
+      case 'shuttle':
+        return RouteType.shuttle;
+      case 'special':
+        return RouteType.special;
+      default:
+        return RouteType.local;
     }
   }
 }
@@ -194,7 +203,8 @@ class RoutePermit {
       permitNumber: json['permit_number'] ?? '',
       issuingAuthority: json['issuing_authority'] ?? '',
       issueDate: DateTime.tryParse(json['issue_date'] ?? '') ?? DateTime.now(),
-      expiryDate: DateTime.tryParse(json['expiry_date'] ?? '') ?? DateTime.now(),
+      expiryDate:
+          DateTime.tryParse(json['expiry_date'] ?? '') ?? DateTime.now(),
       permitType: json['permit_type'] ?? '',
       authorizedCapacity: json['authorized_capacity'] ?? 0,
       isValid: json['is_valid'] ?? false,
@@ -255,8 +265,8 @@ class SafetyMeasures {
       gpsTracking: json['gps_tracking'] ?? false,
       panicButton: json['panic_button'] ?? false,
       cctvCameras: json['cctv_cameras'] ?? 0,
-      emergencyContactNums: List<String>.from(json['emergency_contact_nums'] ?? []),
+      emergencyContactNums:
+          List<String>.from(json['emergency_contact_nums'] ?? []),
     );
   }
 } // minutes from start
-  

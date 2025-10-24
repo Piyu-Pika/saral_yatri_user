@@ -122,7 +122,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-
                 CustomTextField(
                   controller: _fullNameController,
                   label: 'Full Name',
@@ -130,7 +129,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   validator: (value) => Validators.required(value, 'Full Name'),
                 ),
                 const SizedBox(height: 16),
-
                 CustomTextField(
                   controller: _usernameController,
                   label: 'Username',
@@ -138,7 +136,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   validator: Validators.username,
                 ),
                 const SizedBox(height: 16),
-
                 CustomTextField(
                   controller: _emailController,
                   label: 'Email Address',
@@ -147,7 +144,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   validator: Validators.email,
                 ),
                 const SizedBox(height: 16),
-
                 CustomTextField(
                   controller: _phoneController,
                   label: 'Phone Number',
@@ -156,7 +152,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   validator: Validators.phone,
                 ),
                 const SizedBox(height: 16),
-
                 CustomTextField(
                   controller: _aadhaarController,
                   label: 'Aadhaar Number',
@@ -165,7 +160,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   validator: Validators.aadhaar,
                 ),
                 const SizedBox(height: 16),
-
                 CustomTextField(
                   controller: _passwordController,
                   label: 'Password',
@@ -173,7 +167,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   obscureText: _obscurePassword,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                       color: AppColors.textSecondary,
                     ),
                     onPressed: () {
@@ -185,7 +181,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   validator: Validators.password,
                 ),
                 const SizedBox(height: 16),
-
                 CustomTextField(
                   controller: _confirmPasswordController,
                   label: 'Confirm Password',
@@ -193,7 +188,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   obscureText: _obscureConfirmPassword,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                      _obscureConfirmPassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                       color: AppColors.textSecondary,
                     ),
                     onPressed: () {
@@ -205,7 +202,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   validator: Validators.password,
                 ),
                 const SizedBox(height: 32),
-
                 if (authState.isLoading)
                   const Center(child: CircularProgressIndicator())
                 else
@@ -214,9 +210,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     text: 'Create Account',
                     isFullWidth: true,
                   ),
-
                 const SizedBox(height: 24),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

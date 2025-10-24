@@ -15,7 +15,8 @@ class AuthRepository {
 
   Future<UserModel?> login(String username, String password) async {
     try {
-      final user = await _authService.login(username: username, password: password);
+      final user =
+          await _authService.login(username: username, password: password);
       Log.i('Login successful for user: ${user.email}');
       return user;
     } catch (e) {

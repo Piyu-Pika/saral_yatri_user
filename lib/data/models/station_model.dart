@@ -19,7 +19,8 @@ class StationModel {
     required this.isActive,
   });
 
-  factory StationModel.fromJson(Map<String, dynamic> json, {String? routeId, int? sequence}) {
+  factory StationModel.fromJson(Map<String, dynamic> json,
+      {String? routeId, int? sequence}) {
     // Handle different possible location formats
     LatLng location;
     if (json['location'] != null) {
@@ -46,7 +47,8 @@ class StationModel {
       code: (json['code'] ?? json['station_code'] ?? '').toString(),
       location: location,
       sequence: sequence ?? (json['sequence'] ?? json['order'] ?? 0).toInt(),
-      routeId: routeId ?? (json['route_id'] ?? json['routeId'] ?? '').toString(),
+      routeId:
+          routeId ?? (json['route_id'] ?? json['routeId'] ?? '').toString(),
       isActive: json['is_active'] ?? json['active'] ?? true,
     );
   }

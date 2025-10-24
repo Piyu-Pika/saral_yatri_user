@@ -12,12 +12,12 @@ class AppTheme {
   static const Color errorColor = AppColors.error;
   static const Color warningColor = AppColors.warning;
   static const Color successColor = AppColors.success;
-  
+
   // Text Colors
   static const Color textPrimary = AppColors.textPrimary;
   static const Color textSecondary = AppColors.textSecondary;
   static const Color textLight = AppColors.textWhite;
-  
+
   // Light Theme
   static ThemeData get lightTheme {
     return ThemeData(
@@ -60,7 +60,7 @@ class AppTheme {
       ),
     );
   }
-  
+
   // Dark Theme
   static ThemeData get darkTheme {
     return ThemeData(

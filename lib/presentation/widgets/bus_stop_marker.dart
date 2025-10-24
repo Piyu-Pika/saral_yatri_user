@@ -96,7 +96,9 @@ class BusStopMarker extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: busStop.isActive ? AppTheme.successColor : Colors.grey,
+                      color: busStop.isActive
+                          ? AppTheme.successColor
+                          : Colors.grey,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -110,9 +112,9 @@ class BusStopMarker extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Routes
               if (busStop.routeIds.isNotEmpty) ...[
                 const Text(
@@ -151,9 +153,10 @@ class BusStopMarker extends StatelessWidget {
                   }).toList(),
                 ),
               ],
-              
+
               // Amenities
-              if (busStop.amenities != null && busStop.amenities!.isNotEmpty) ...[
+              if (busStop.amenities != null &&
+                  busStop.amenities!.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 const Text(
                   'Amenities',
@@ -170,9 +173,9 @@ class BusStopMarker extends StatelessWidget {
                   ),
                 ),
               ],
-              
+
               const SizedBox(height: 20),
-              
+
               // Action Button
               if (busStop.isActive)
                 SizedBox(

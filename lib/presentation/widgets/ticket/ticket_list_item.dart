@@ -23,8 +23,8 @@ class TicketListItemWidget extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: ticket.isExpired 
-              ? AppColors.error.withValues(alpha: 0.3) 
+          color: ticket.isExpired
+              ? AppColors.error.withValues(alpha: 0.3)
               : AppColors.primary.withValues(alpha: 0.3),
           width: 1,
         ),
@@ -45,13 +45,17 @@ class TicketListItemWidget extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: (ticket.isExpired ? AppColors.error : AppColors.primary)
+                        color: (ticket.isExpired
+                                ? AppColors.error
+                                : AppColors.primary)
                             .withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
                         Icons.confirmation_number,
-                        color: ticket.isExpired ? AppColors.error : AppColors.primary,
+                        color: ticket.isExpired
+                            ? AppColors.error
+                            : AppColors.primary,
                         size: 20,
                       ),
                     ),
@@ -75,7 +79,8 @@ class TicketListItemWidget extends StatelessWidget {
                                 Icon(
                                   Icons.check_circle,
                                   size: 12,
-                                  color: AppColors.success.withValues(alpha: 0.7),
+                                  color:
+                                      AppColors.success.withValues(alpha: 0.7),
                                 ),
                               ],
                             ],
@@ -91,9 +96,10 @@ class TicketListItemWidget extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: ticket.isExpired 
+                        color: ticket.isExpired
                             ? AppColors.error.withValues(alpha: 0.1)
                             : AppColors.success.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
@@ -103,7 +109,9 @@ class TicketListItemWidget extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
-                          color: ticket.isExpired ? AppColors.error : AppColors.success,
+                          color: ticket.isExpired
+                              ? AppColors.error
+                              : AppColors.success,
                         ),
                       ),
                     ),
@@ -186,7 +194,9 @@ class TicketListItemWidget extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: ticket.isExpired ? AppColors.error : AppColors.primary,
+                        color: ticket.isExpired
+                            ? AppColors.error
+                            : AppColors.primary,
                       ),
                     ),
                   ],
@@ -205,7 +215,8 @@ class TicketListItemWidget extends StatelessWidget {
   }
 
   String _getTicketDisplay() {
-    final ticketNumber = ticket.ticketNumber ?? TicketUtils.getDisplayTicketNumber(ticket.id);
+    final ticketNumber =
+        ticket.ticketNumber ?? TicketUtils.getDisplayTicketNumber(ticket.id);
     return 'Ticket #$ticketNumber';
   }
 

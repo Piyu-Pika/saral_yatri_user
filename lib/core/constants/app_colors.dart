@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 class AppColors {
   // Primary Colors (from the logo's blue)
   static const Color primary = Color(0xFF005B96); // Deep blue from the bus
-  static const Color primaryLight = Color(0xFF6BA7D0); // Light blue from motion lines
-  static const Color primaryDark = Color(0xFF003D66); // Darker shade of the bus blue
+  static const Color primaryLight =
+      Color(0xFF6BA7D0); // Light blue from motion lines
+  static const Color primaryDark =
+      Color(0xFF003D66); // Darker shade of the bus blue
 
   // Secondary Colors (from the logo's red)
   static const Color secondary = Color(0xFFD13447); // Red from "saral" text

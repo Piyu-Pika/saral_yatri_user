@@ -24,10 +24,12 @@ class TicketBookingFormScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<TicketBookingFormScreen> createState() => _TicketBookingFormScreenState();
+  ConsumerState<TicketBookingFormScreen> createState() =>
+      _TicketBookingFormScreenState();
 }
 
-class _TicketBookingFormScreenState extends ConsumerState<TicketBookingFormScreen> {
+class _TicketBookingFormScreenState
+    extends ConsumerState<TicketBookingFormScreen> {
   String _selectedTicketType = 'single';
   PaymentMethod _selectedPaymentMethod = PaymentMethod.upi;
   DateTime _selectedTravelDate = DateTime.now();

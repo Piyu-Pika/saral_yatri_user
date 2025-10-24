@@ -1,6 +1,7 @@
 class ApiConstants {
   // Base Configuration
-  static const String baseUrl = 'https://unprophesied-emerson-unrubrically.ngrok-free.dev/api/v1';
+  static const String baseUrl =
+      'https://unprophesied-emerson-unrubrically.ngrok-free.dev/api/v1';
   static const Duration connectTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
 
@@ -20,8 +21,10 @@ class ApiConstants {
   static const String activeRoutes = '/routes/active';
   static const String routeById = '/routes';
   static const String routeFare = '/routes/fare';
-  static const String routeStations = '/routes'; // /routes/{route_id}/stations/active
-  static const String routeActiveStations = '/routes'; // /routes/{route_id}/stations/active
+  static const String routeStations =
+      '/routes'; // /routes/{route_id}/stations/active
+  static const String routeActiveStations =
+      '/routes'; // /routes/{route_id}/stations/active
 
   // Station Endpoints
   static const String activeStations = '/stations/active';
@@ -34,14 +37,17 @@ class ApiConstants {
   static const String myTickets = '/tickets/passenger/my-tickets';
   static const String myActiveTickets = '/tickets/passenger/my-active-tickets';
   static const String ticketDetails = '/tickets/passenger';
-  static const String ticketStatus = '/tickets/passenger'; // /tickets/passenger/{id}/status
-  static const String ticketIsActive = '/tickets/passenger'; // /tickets/passenger/{id}/is-active
+  static const String ticketStatus =
+      '/tickets/passenger'; // /tickets/passenger/{id}/status
+  static const String ticketIsActive =
+      '/tickets/passenger'; // /tickets/passenger/{id}/is-active
   static const String calculateFare = '/tickets/calculate-fare';
 
   // Subsidy Application Endpoints
   static const String submitSubsidyApplication = '/user/subsidy-applications';
   static const String mySubsidyApplications = '/user/subsidy-applications';
-  static const String subsidyApplicationDetails = '/user/subsidy-applications'; // /user/subsidy-applications/{id}
+  static const String subsidyApplicationDetails =
+      '/user/subsidy-applications'; // /user/subsidy-applications/{id}
 
   // Headers
   static const String authHeader = 'Authorization';

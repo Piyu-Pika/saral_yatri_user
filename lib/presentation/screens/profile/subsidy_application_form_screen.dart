@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/utils/subsidy_validation_helper.dart';
 import '../../../data/models/subsidy_application.dart';
 import '../../../data/providers/subsidy_provider.dart';
 import '../../widgets/common/custom_app_bar.dart';
@@ -550,18 +551,23 @@ class _SubsidyApplicationFormScreenState
                   child: ListTile(
                     leading: Icon(
                       isUploaded ? Icons.check_circle : Icons.upload_file,
-                      color: isUploaded ? AppColors.success : AppColors.textSecondary,
+                      color: isUploaded
+                          ? AppColors.success
+                          : AppColors.textSecondary,
                     ),
                     title: Text(docType.displayName),
                     subtitle: Text(
                       isUploaded ? 'Uploaded' : 'Tap to upload',
                       style: TextStyle(
-                        color: isUploaded ? AppColors.success : AppColors.textSecondary,
+                        color: isUploaded
+                            ? AppColors.success
+                            : AppColors.textSecondary,
                       ),
                     ),
                     trailing: isUploaded
                         ? IconButton(
-                            icon: const Icon(Icons.delete, color: AppColors.error),
+                            icon: const Icon(Icons.delete,
+                                color: AppColors.error),
                             onPressed: () {
                               setState(() {
                                 _selectedDocuments.remove(docType);
@@ -594,21 +600,29 @@ class _SubsidyApplicationFormScreenState
             ),
           ),
           const SizedBox(height: 24),
-          _buildReviewSection('Subsidy Type', _selectedSubsidyType?.displayName ?? ''),
+          _buildReviewSection(
+              'Subsidy Type', _selectedSubsidyType?.displayName ?? ''),
           _buildReviewSection('Full Name', _fullNameController.text),
           _buildReviewSection('Phone', _phoneController.text),
           _buildReviewSection('Email', _emailController.text),
           _buildReviewSection('Aadhaar', _aadhaarController.text),
-          _buildReviewSection('Date of Birth', 
-            _dateOfBirth != null ? '${_dateOfBirth!.day}/${_dateOfBirth!.month}/${_dateOfBirth!.year}' : ''),
-          _buildReviewSection('Gender', _selectedGender?.name.toUpperCase() ?? ''),
-          _buildReviewSection('Address', 
-            '${_streetController.text}, ${_cityController.text}, ${_districtController.text}, ${_stateController.text} - ${_pincodeController.text}'),
-          _buildReviewSection('Monthly Income', '₹${_monthlyIncomeController.text}'),
-          _buildReviewSection('Annual Income', '₹${_annualIncomeController.text}'),
+          _buildReviewSection(
+              'Date of Birth',
+              _dateOfBirth != null
+                  ? '${_dateOfBirth!.day}/${_dateOfBirth!.month}/${_dateOfBirth!.year}'
+                  : ''),
+          _buildReviewSection(
+              'Gender', _selectedGender?.name.toUpperCase() ?? ''),
+          _buildReviewSection('Address',
+              '${_streetController.text}, ${_cityController.text}, ${_districtController.text}, ${_stateController.text} - ${_pincodeController.text}'),
+          _buildReviewSection(
+              'Monthly Income', '₹${_monthlyIncomeController.text}'),
+          _buildReviewSection(
+              'Annual Income', '₹${_annualIncomeController.text}'),
           _buildReviewSection('Income Source', _incomeSourceController.text),
           _buildReviewSection('Family Members', _familyMembersController.text),
-          _buildReviewSection('Family Income', '₹${_familyIncomeController.text}'),
+          _buildReviewSection(
+              'Family Income', '₹${_familyIncomeController.text}'),
           _buildReviewSection('Reason', _reasonController.text),
           const SizedBox(height: 16),
           const Text(
@@ -624,7 +638,8 @@ class _SubsidyApplicationFormScreenState
               padding: const EdgeInsets.only(bottom: 4),
               child: Row(
                 children: [
-                  const Icon(Icons.check_circle, color: AppColors.success, size: 16),
+                  const Icon(Icons.check_circle,
+                      color: AppColors.success, size: 16),
                   const SizedBox(width: 8),
                   Text(docType.displayName),
                 ],
@@ -777,7 +792,7 @@ class _SubsidyApplicationFormScreenState
 
   bool _validateDocuments() {
     if (_selectedSubsidyType == null) return false;
-    
+
     final requiredDocuments = _selectedSubsidyType!.requiredDocuments;
     for (final docType in requiredDocuments) {
       if (_selectedDocuments[docType] == null) {
@@ -866,7 +881,8 @@ class _SubsidyApplicationFormScreenState
         familyMembers = int.parse(_familyMembersController.text.trim());
         familyIncome = double.parse(_familyIncomeController.text.trim());
       } catch (e) {
-        _showSnackBar('Please enter valid numeric values for income and family members');
+        _showSnackBar(
+            'Please enter valid numeric values for income and family members');
         return;
       }
 
@@ -894,9 +910,13 @@ class _SubsidyApplicationFormScreenState
       }
 
       // Format Aadhaar number (ensure it has dashes)
-      String formattedAadhaar = _aadhaarController.text.trim().replaceAll(' ', '').replaceAll('-', '');
+      String formattedAadhaar = _aadhaarController.text
+          .trim()
+          .replaceAll(' ', '')
+          .replaceAll('-', '');
       if (formattedAadhaar.length == 12) {
-        formattedAadhaar = '${formattedAadhaar.substring(0, 4)}-${formattedAadhaar.substring(4, 8)}-${formattedAadhaar.substring(8, 12)}';
+        formattedAadhaar =
+            '${formattedAadhaar.substring(0, 4)}-${formattedAadhaar.substring(4, 8)}-${formattedAadhaar.substring(8, 12)}';
       }
 
       final request = SubsidyApplicationRequest(
@@ -925,7 +945,11 @@ class _SubsidyApplicationFormScreenState
         documents: documents,
       );
 
-      final success = await ref.read(subsidyProvider.notifier).submitApplication(request);
+      // Validate and log the request before submission
+      SubsidyValidationHelper.validateAndLogRequest(request);
+
+      final success =
+          await ref.read(subsidyProvider.notifier).submitApplication(request);
 
       if (success) {
         _showSnackBar('Application submitted successfully!');
@@ -962,8 +986,7 @@ class _SubsidyApplicationFormScreenState
     }
 
     // Validate email format
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(_emailController.text.trim())) {
+    if (!SubsidyValidationHelper.validateEmail(_emailController.text.trim())) {
       _showSnackBar('Please enter a valid email address');
       return false;
     }
@@ -974,8 +997,8 @@ class _SubsidyApplicationFormScreenState
     }
 
     // Validate Aadhaar format (12 digits)
-    final aadhaarDigits = _aadhaarController.text.replaceAll(RegExp(r'[^0-9]'), '');
-    if (aadhaarDigits.length != 12) {
+    if (!SubsidyValidationHelper.validateAadhaarNumber(
+        _aadhaarController.text.trim())) {
       _showSnackBar('Aadhaar number must be 12 digits');
       return false;
     }
@@ -1001,8 +1024,8 @@ class _SubsidyApplicationFormScreenState
     }
 
     // Validate pincode (6 digits)
-    final pincodeDigits = _pincodeController.text.replaceAll(RegExp(r'[^0-9]'), '');
-    if (pincodeDigits.length != 6) {
+    if (!SubsidyValidationHelper.validatePincode(
+        _pincodeController.text.trim())) {
       _showSnackBar('Pincode must be 6 digits');
       return false;
     }

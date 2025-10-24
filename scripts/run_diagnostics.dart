@@ -8,10 +8,10 @@ import 'api_diagnostic_script.dart';
 void main(List<String> args) async {
   print('🚀 Saral Yatri API Diagnostic Tool');
   print('=' * 50);
-  
+
   // Check if we should run in interactive mode
   bool interactive = args.contains('--interactive') || args.contains('-i');
-  
+
   if (interactive) {
     await runInteractiveMode();
   } else {
@@ -21,7 +21,7 @@ void main(List<String> args) async {
 
 Future<void> runAutomaticMode() async {
   print('Running automatic diagnostics...\n');
-  
+
   final diagnostic = ApiDiagnosticScript();
   await diagnostic.runDiagnostics();
   diagnostic.generateReport();
@@ -29,7 +29,7 @@ Future<void> runAutomaticMode() async {
 
 Future<void> runInteractiveMode() async {
   final diagnostic = ApiDiagnosticScript();
-  
+
   while (true) {
     print('\n📋 Choose an option:');
     print('1. Run full diagnostics');
@@ -37,27 +37,27 @@ Future<void> runInteractiveMode() async {
     print('3. Generate report');
     print('4. Exit');
     print('\nEnter your choice (1-4): ');
-    
+
     final input = stdin.readLineSync();
-    
+
     switch (input) {
       case '1':
         print('\n🔍 Running full diagnostics...');
         await diagnostic.runDiagnostics();
         break;
-        
+
       case '2':
         await testSpecificEndpoint(diagnostic);
         break;
-        
+
       case '3':
         diagnostic.generateReport();
         break;
-        
+
       case '4':
         print('👋 Goodbye!');
         exit(0);
-        
+
       default:
         print('❌ Invalid choice. Please enter 1-4.');
     }
@@ -73,9 +73,9 @@ Future<void> testSpecificEndpoint(ApiDiagnosticScript diagnostic) async {
   print('5. Fare Calculation');
   print('6. Tickets');
   print('\nEnter endpoint number (1-6): ');
-  
+
   final input = stdin.readLineSync();
-  
+
   switch (input) {
     case '1':
       print('🔐 Testing authentication...');

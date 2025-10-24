@@ -6,8 +6,8 @@ import '../../data/models/user_model.dart';
 import '../../data/repositories/auth_repository.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) => AuthRepository(
-  ref.read(authServiceProvider),
-));
+      ref.read(authServiceProvider),
+    ));
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier(ref.read(authRepositoryProvider));
@@ -79,7 +79,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<bool> login(String username, String password) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final user = await _authRepository.login(username, password);
       if (user != null) {
@@ -114,7 +114,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required String phone,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final user = await _authRepository.register(
         name: name,

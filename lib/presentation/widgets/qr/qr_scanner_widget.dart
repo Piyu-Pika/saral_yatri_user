@@ -62,8 +62,9 @@ class _QRScannerWidgetState extends State<QRScannerWidget> {
     });
 
     try {
-      AppLogger.info('QR Code detected: ${code.substring(0, code.length > 20 ? 20 : code.length)}...');
-      
+      AppLogger.info(
+          'QR Code detected: ${code.substring(0, code.length > 20 ? 20 : code.length)}...');
+
       // Parse QR data based on type
       final qrData = QRService.parseQRData(code);
       if (qrData == null) {
@@ -247,27 +248,44 @@ class QrScannerOverlayShape extends ShapeBorder {
       // Top left
       ..moveTo(cutOutRect.left - borderOffset, cutOutRect.top + mBorderLength)
       ..lineTo(cutOutRect.left - borderOffset, cutOutRect.top + borderRadius)
-      ..quadraticBezierTo(cutOutRect.left - borderOffset, cutOutRect.top - borderOffset,
-          cutOutRect.left + borderRadius, cutOutRect.top - borderOffset)
+      ..quadraticBezierTo(
+          cutOutRect.left - borderOffset,
+          cutOutRect.top - borderOffset,
+          cutOutRect.left + borderRadius,
+          cutOutRect.top - borderOffset)
       ..lineTo(cutOutRect.left + mBorderLength, cutOutRect.top - borderOffset)
       // Top right
       ..moveTo(cutOutRect.right - mBorderLength, cutOutRect.top - borderOffset)
       ..lineTo(cutOutRect.right - borderRadius, cutOutRect.top - borderOffset)
-      ..quadraticBezierTo(cutOutRect.right + borderOffset, cutOutRect.top - borderOffset,
-          cutOutRect.right + borderOffset, cutOutRect.top + borderRadius)
+      ..quadraticBezierTo(
+          cutOutRect.right + borderOffset,
+          cutOutRect.top - borderOffset,
+          cutOutRect.right + borderOffset,
+          cutOutRect.top + borderRadius)
       ..lineTo(cutOutRect.right + borderOffset, cutOutRect.top + mBorderLength)
       // Bottom right
-      ..moveTo(cutOutRect.right + borderOffset, cutOutRect.bottom - mBorderLength)
-      ..lineTo(cutOutRect.right + borderOffset, cutOutRect.bottom - borderRadius)
-      ..quadraticBezierTo(cutOutRect.right + borderOffset, cutOutRect.bottom + borderOffset,
-          cutOutRect.right - borderRadius, cutOutRect.bottom + borderOffset)
-      ..lineTo(cutOutRect.right - mBorderLength, cutOutRect.bottom + borderOffset)
+      ..moveTo(
+          cutOutRect.right + borderOffset, cutOutRect.bottom - mBorderLength)
+      ..lineTo(
+          cutOutRect.right + borderOffset, cutOutRect.bottom - borderRadius)
+      ..quadraticBezierTo(
+          cutOutRect.right + borderOffset,
+          cutOutRect.bottom + borderOffset,
+          cutOutRect.right - borderRadius,
+          cutOutRect.bottom + borderOffset)
+      ..lineTo(
+          cutOutRect.right - mBorderLength, cutOutRect.bottom + borderOffset)
       // Bottom left
-      ..moveTo(cutOutRect.left + mBorderLength, cutOutRect.bottom + borderOffset)
+      ..moveTo(
+          cutOutRect.left + mBorderLength, cutOutRect.bottom + borderOffset)
       ..lineTo(cutOutRect.left + borderRadius, cutOutRect.bottom + borderOffset)
-      ..quadraticBezierTo(cutOutRect.left - borderOffset, cutOutRect.bottom + borderOffset,
-          cutOutRect.left - borderOffset, cutOutRect.bottom - borderRadius)
-      ..lineTo(cutOutRect.left - borderOffset, cutOutRect.bottom - mBorderLength);
+      ..quadraticBezierTo(
+          cutOutRect.left - borderOffset,
+          cutOutRect.bottom + borderOffset,
+          cutOutRect.left - borderOffset,
+          cutOutRect.bottom - borderRadius)
+      ..lineTo(
+          cutOutRect.left - borderOffset, cutOutRect.bottom - mBorderLength);
 
     canvas.drawPath(path, borderPaint);
   }

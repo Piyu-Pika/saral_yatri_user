@@ -338,7 +338,7 @@ class _BookingHistoryScreenState extends ConsumerState<BookingHistoryScreen>
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => QrTicketScreen(
-                      ticket: currentEnhancedTicket,
+                      ticket: currentEnhancedTicket.toTicketModel(),
                       enhancedDisplay: enhancedTicket,
                     ),
                   ),

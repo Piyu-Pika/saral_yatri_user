@@ -26,15 +26,18 @@ class ApiService {
           _authService.logout();
           return ApiException('Unauthorized. Please login again.');
         }
-        return ApiException(error.response?.data?['error'] ?? 'Server error occurred.');
+        return ApiException(
+            error.response?.data?['error'] ?? 'Server error occurred.');
       case DioExceptionType.connectionError:
-        return ApiException('No internet connection. Please check your network.');
+        return ApiException(
+            'No internet connection. Please check your network.');
       default:
         return ApiException('An unexpected error occurred.');
     }
   }
 
-  Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) async {
+  Future<Response> get(String path,
+      {Map<String, dynamic>? queryParameters}) async {
     try {
       AppLogger.debug('[ApiService] GET request to: $path');
       return await ApiClient.get(path, queryParameters: queryParameters);

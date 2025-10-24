@@ -40,7 +40,7 @@ class QRCodeWidget extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // Expired Overlay
         if (isExpired)
           Container(

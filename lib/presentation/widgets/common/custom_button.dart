@@ -88,7 +88,8 @@ class CustomButton extends StatelessWidget {
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           elevation: 2,
-          padding: padding ?? const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: padding ??
+              const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
           ),
@@ -99,7 +100,8 @@ class CustomButton extends StatelessWidget {
           backgroundColor: AppColors.secondary,
           foregroundColor: AppColors.textPrimary,
           elevation: 1,
-          padding: padding ?? const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: padding ??
+              const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
           ),
@@ -109,7 +111,8 @@ class CustomButton extends StatelessWidget {
           backgroundColor: Colors.transparent,
           foregroundColor: AppColors.primary,
           side: const BorderSide(color: AppColors.primary, width: 2),
-          padding: padding ?? const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: padding ??
+              const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
           ),

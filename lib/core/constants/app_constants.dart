@@ -1,6 +1,7 @@
 class AppConstants {
   // API
-  static const String baseUrl = 'https://unprophesied-emerson-unrubrically.ngrok-free.dev/api';
+  static const String baseUrl =
+      'https://unprophesied-emerson-unrubrically.ngrok-free.dev/api';
   static const String apiVersion = '/v1';
 
   // Endpoints

@@ -62,38 +62,37 @@ class AuthService {
     }
   }
 
-Future<UserModel> login({
-  required String username,
-  required String password,
-}) async {
-  try {
-    final response = await _apiClient.dio.post('/auth/login', data: {
-      'username': username,
-      'password': password,
-    });
+  Future<UserModel> login({
+    required String username,
+    required String password,
+  }) async {
+    try {
+      final response = await _apiClient.dio.post('/auth/login', data: {
+        'username': username,
+        'password': password,
+      });
 
-    if (response.data != null && response.data['data'] != null) {
-      final data = response.data['data'] as Map<String, dynamic>;
+      if (response.data != null && response.data['data'] != null) {
+        final data = response.data['data'] as Map<String, dynamic>;
 
-      final token = data['token'] as String;
-      final userMap = data['user'] as Map<String, dynamic>;
+        final token = data['token'] as String;
+        final userMap = data['user'] as Map<String, dynamic>;
 
-      final user = UserModel.fromJson(userMap);
+        final user = UserModel.fromJson(userMap);
 
-      _apiClient.setToken(token);
-      await StorageService.setString(AppConstants.userTokenKey, token);
-      await StorageService.setObject(AppConstants.userDataKey, user.toJson());
-      await StorageService.setBool(AppConstants.isLoggedInKey, true);
+        _apiClient.setToken(token);
+        await StorageService.setString(AppConstants.userTokenKey, token);
+        await StorageService.setObject(AppConstants.userDataKey, user.toJson());
+        await StorageService.setBool(AppConstants.isLoggedInKey, true);
 
-      return user;
-    } else {
-      throw Exception('Invalid response from server');
+        return user;
+      } else {
+        throw Exception('Invalid response from server');
+      }
+    } on DioException catch (e) {
+      throw _handleError(e);
     }
-  } on DioException catch (e) {
-    throw _handleError(e);
   }
-}
-
 
   Future<UserModel> getProfile() async {
     try {

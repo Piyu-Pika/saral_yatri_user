@@ -110,17 +110,17 @@ class BusMarker extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Bus Details
               _buildInfoRow('Driver', bus.driverName),
               _buildInfoRow('Conductor', bus.conductorName),
               _buildInfoRow('Total Seats', '${bus.totalSeats}'),
               _buildInfoRow('Available Seats', '${bus.availableSeats}'),
-              
+
               const SizedBox(height: 20),
-              
+
               // Action Button
               if (bus.isActive && bus.availableSeats > 0)
                 SizedBox(

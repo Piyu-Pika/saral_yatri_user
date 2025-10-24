@@ -27,7 +27,7 @@ class LocationService {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
-      
+
       Log.i('Current location: ${position.latitude}, ${position.longitude}');
       return position;
     } catch (e) {
@@ -35,7 +35,7 @@ class LocationService {
       return null;
     }
   }
-  
+
   static Stream<Position> getLocationStream() {
     return Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
@@ -44,7 +44,7 @@ class LocationService {
       ),
     );
   }
-  
+
   static double calculateDistance(
     double startLatitude,
     double startLongitude,

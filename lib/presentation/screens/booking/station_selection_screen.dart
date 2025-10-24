@@ -175,7 +175,9 @@ class _StationSelectionScreenState
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
-                                widget.selectedBus!.isActive ? 'ACTIVE' : 'INACTIVE',
+                                widget.selectedBus!.isActive
+                                    ? 'ACTIVE'
+                                    : 'INACTIVE',
                                 style: const TextStyle(
                                   fontSize: 10,
                                   color: AppColors.success,
@@ -235,8 +237,8 @@ class _StationSelectionScreenState
                 label: 'Destination Station',
                 hintText: 'Select where you will get off',
                 selectedStation: _selectedDestinationStation,
-                excludeStationIds: _selectedBoardingStation?.id != null 
-                    ? [_selectedBoardingStation!.id] 
+                excludeStationIds: _selectedBoardingStation?.id != null
+                    ? [_selectedBoardingStation!.id]
                     : null,
                 onChanged: (station) {
                   setState(() {

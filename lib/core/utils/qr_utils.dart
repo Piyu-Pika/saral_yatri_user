@@ -13,12 +13,12 @@ class QrUtils {
   /// Generate QR code from QR data object
   static QrCode generateQrCode(QrData qrData) {
     final qrDataString = generateQrData(qrData);
-    
+
     final qr = QrCode.fromData(
       data: qrDataString,
       errorCorrectLevel: QrErrorCorrectLevel.M,
     );
-    
+
     return qr;
   }
 
@@ -30,7 +30,7 @@ class QrUtils {
     Color backgroundColor = Colors.white,
   }) {
     final qrDataString = generateQrData(qrData);
-    
+
     return Container(
       width: size,
       height: size,
@@ -54,7 +54,7 @@ class QrUtils {
   static bool isValidQrData(String qrDataString) {
     try {
       final data = jsonDecode(qrDataString);
-      
+
       // Check if required fields are present
       final requiredFields = [
         'ticket_id',
@@ -72,13 +72,13 @@ class QrUtils {
         'issuing_authority',
         'timestamp',
       ];
-      
+
       for (final field in requiredFields) {
         if (!data.containsKey(field) || data[field] == null) {
           return false;
         }
       }
-      
+
       return true;
     } catch (e) {
       return false;
@@ -91,7 +91,7 @@ class QrUtils {
       if (!isValidQrData(qrDataString)) {
         return null;
       }
-      
+
       final data = jsonDecode(qrDataString);
       return QrData.fromJson(data);
     } catch (e) {
@@ -121,7 +121,7 @@ class QrUtils {
       'cc': qrData.cityCode,
       'ts': qrData.timestamp,
     };
-    
+
     return jsonEncode(compactData);
   }
 }
@@ -169,9 +169,9 @@ class SimpleQrPainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..color = color
         ..strokeWidth = 2;
-      
+
       canvas.drawRect(Offset.zero & size, paint);
-      
+
       // Draw text indicating QR code
       final textPainter = TextPainter(
         text: TextSpan(
